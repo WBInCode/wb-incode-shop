@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model Product {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  namePl         String
+  nameEn         String
+  descriptionPl  String
+  descriptionEn  String
+  categoryPl     String
+  categoryEn     String
+  technologies   String    @default("[]") // JSON array string
+  screenshots    String    @default("[]") // JSON array string
+  videoUrl       String?   // YouTube/Vimeo embed URL or direct video URL
+  fileUrl        String
+  featured       Boolean   @default(false)
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  variants       Variant[]
+  orders         Order[]
+}
+
+model Variant {
+  id             String   @id @default(cuid())
+  productId      String
+  namePl         String
+  nameEn         String
+  descriptionPl  String
+  descriptionEn  String
+  price          Int      // price in grosze (PLN cents)
+  currency       String   @default("PLN")
+  active         Boolean  @default(true)
+
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orders         Order[]
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  email             String
+  productId         String
+  variantId         String
+  amount            Int         // amount in grosze
+  currency          String      @default("PLN")
+  status            OrderStatus @default(PENDING)
+  payuOrderId       String?     @unique
+  downloadToken     String      @unique
+  downloadCount     Int         @default(0)
+  maxDownloads      Int         @default(5)
+  downloadExpiresAt DateTime
+  createdAt         DateTime    @default(now())
+
+  product           Product     @relation(fields: [productId], references: [id])
+  variant           Variant     @relation(fields: [variantId], references: [id])
+}
+
+model Admin {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          AdminRole @default(ADMIN)
+  createdAt     DateTime  @default(now())
+}

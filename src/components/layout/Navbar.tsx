@@ -1,0 +1,127 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ShoppingBag } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import Link from "next/link";
+
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useTranslations("nav");
+  const locale = useLocale();
+  const otherLocale = locale === "pl" ? "en" : "pl";
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { href: `/${locale}`, label: t("home") },
+    { href: `/${locale}/templates`, label: t("templates") },
+  ];
+
+  return (
+    <motion.nav
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "glass-nav" : ""
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo */}
+          <Link href={`/${locale}`} className="flex items-center gap-2">
+            <ShoppingBag className="w-7 h-7 text-primary" />
+            <span className="text-xl font-bold text-white">
+              WB <span className="text-primary">InCode</span>
+              <span className="text-gray-500 text-sm ml-1">Shop</span>
+            </span>
+          </Link>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="relative text-sm text-gray-400 hover:text-white transition-colors group"
+              >
+                {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ))}
+
+            {/* Language Switcher */}
+            <Link
+              href={`/${otherLocale}`}
+              className="text-sm text-gray-500 hover:text-primary transition-colors px-3 py-1.5 border border-white/10 rounded-full hover:border-primary/30"
+            >
+              {t("language")}
+            </Link>
+
+            {/* CTA */}
+            <Link
+              href={`/${locale}/templates`}
+              className="px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-semibold hover:shadow-[0_0_30px_rgba(48,232,122,0.4)] transition-all duration-300"
+            >
+              {t("templates")}
+            </Link>
+          </div>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden text-gray-400 hover:text-white p-2"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden backdrop-blur-xl bg-surface/95 border-t border-white/5"
+          >
+            <div className="px-4 py-6 space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-gray-400 hover:text-white transition-colors py-2"
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <Link
+                href={`/${otherLocale}`}
+                className="block text-gray-500 hover:text-primary transition-colors py-2"
+              >
+                {t("language")}
+              </Link>
+              <Link
+                href={`/${locale}/templates`}
+                onClick={() => setMobileOpen(false)}
+                className="block w-full text-center px-5 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
+              >
+                {t("templates")}
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
+  );
+}

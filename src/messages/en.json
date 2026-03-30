@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": "WB InCode Shop — Digital Products for Developers",
+    "description": "Professional digital products: website templates, tools, scripts and plugins. Buy, download, and launch in minutes."
+  },
+  "nav": {
+    "home": "Home",
+    "templates": "Products",
+    "contact": "Contact",
+    "language": "PL"
+  },
+  "hero": {
+    "badge": "Software House Shop",
+    "title": "Digital products",
+    "titleAccent": "by software house",
+    "subtitle": "Website templates, tools, scripts and ready-made solutions. Buy products crafted by a professional dev team.",
+    "cta": "Browse products",
+    "ctaSecondary": "How it works?"
+  },
+  "featured": {
+    "title": "Featured products",
+    "subtitle": "Our best solutions, ready for immediate use",
+    "viewAll": "View all"
+  },
+  "howItWorks": {
+    "title": "How it works?",
+    "subtitle": "Three simple steps to a ready-made solution",
+    "step1Title": "Choose a product",
+    "step1Desc": "Browse our collection of templates, tools and scripts — find exactly what you need.",
+    "step2Title": "Buy a license",
+    "step2Desc": "Pay securely via PayU — BLIK, card, or bank transfer.",
+    "step3Title": "Download & launch",
+    "step3Desc": "Get source files via email and deploy your product in minutes."
+  },
+  "templates": {
+    "title": "All products",
+    "subtitle": "Find the perfect solution for your project",
+    "search": "Search products...",
+    "category": "Category",
+    "allCategories": "All",
+    "technology": "Technology",
+    "priceFrom": "from",
+    "noResults": "No products found matching your criteria.",
+    "buyNow": "Buy now",
+    "details": "Details",
+    "featured": "Featured"
+  },
+  "templateDetail": {
+    "technologies": "Technologies",
+    "description": "Description",
+    "screenshots": "Screenshots",
+    "video": "Video preview",
+    "variants": "Choose a license",
+    "buyNow": "Buy now",
+    "back": "Back to products"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "email": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "emailHint": "We'll send the download link to this email.",
+    "variant": "Selected variant",
+    "total": "Total",
+    "pay": "Pay with PayU",
+    "processing": "Processing...",
+    "terms": "By purchasing you agree to our",
+    "termsLink": "terms of service",
+    "privacyLink": "privacy policy"
+  },
+  "success": {
+    "title": "Payment complete!",
+    "subtitle": "Thank you for your purchase. Your product is ready for download.",
+    "download": "Download product",
+    "emailSent": "The download link has also been sent to your email.",
+    "note": "The link is valid for 7 days. You can download the file up to 5 times.",
+    "backToShop": "Back to shop"
+  },
+  "cancel": {
+    "title": "Payment cancelled",
+    "subtitle": "Your payment has been cancelled. You have not been charged.",
+    "tryAgain": "Try again",
+    "backToShop": "Back to shop"
+  },
+  "footer": {
+    "description": "Professional digital products by WB InCode. Templates, tools, and ready-made solutions for developers and businesses.",
+    "nav": "Navigation",
+    "legal": "Legal",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "contact": "Contact",
+    "rights": "All rights reserved."
+  },
+  "cookie": {
+    "message": "We use cookies to ensure the best experience on our site.",
+    "learnMore": "Learn more",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about our products",
+    "q1": "What do I get after purchase?",
+    "a1": "After purchase, you'll receive full source files of the product (source code) that you can download and deploy. A download link will be sent to your email.",
+    "q2": "What are the differences between licenses?",
+    "a2": "Personal license allows use in one personal project. Commercial license allows use in commercial projects and for clients without limits.",
+    "q3": "How long can I download the files?",
+    "a3": "The download link is valid for 7 days from purchase. You can download the files up to 5 times within this period.",
+    "q4": "What payment methods are available?",
+    "a4": "We accept all popular payment methods via PayU: BLIK, payment cards (Visa, Mastercard), bank transfers.",
+    "q5": "Can I get an invoice?",
+    "a5": "Yes, contact us after purchase with your order number and we'll issue a VAT invoice."
+  }
+}
