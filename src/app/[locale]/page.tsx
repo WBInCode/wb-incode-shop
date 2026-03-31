@@ -2,7 +2,6 @@ import Hero from "@/components/shop/Hero";
 import FeaturedTemplates from "@/components/shop/FeaturedTemplates";
 import HowItWorks from "@/components/shop/HowItWorks";
 import FAQ from "@/components/shop/FAQ";
-import Spotlight from "@/components/ui/Spotlight";
 import prisma from "@/lib/prisma";
 import { parseProductArrays } from "@/lib/utils";
 
@@ -18,7 +17,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <Spotlight />
       <Hero />
       <FeaturedTemplates products={featuredProducts} />
       <HowItWorks />
