@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  Users,
   LogOut,
   Menu,
   X,
@@ -23,6 +24,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Produkty", href: "/admin/products", icon: Package },
   { name: "Zamówienia", href: "/admin/orders", icon: ShoppingCart },
+  { name: "Użytkownicy", href: "/admin/users", icon: Users },
 ];
 
 export default function AdminSidebar({ user }: SidebarProps) {

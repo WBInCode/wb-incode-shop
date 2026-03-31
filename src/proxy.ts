@@ -40,7 +40,7 @@ async function verifyGateSignature(value: string): Promise<boolean> {
   return timingSafeEqual(value, expected) || timingSafeEqual(value, expectedYesterday);
 }
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip i18n for admin routes and API routes

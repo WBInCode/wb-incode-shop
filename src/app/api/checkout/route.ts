@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { createPayUOrder } from "@/lib/payu";
 import { generateDownloadToken, getDownloadExpiryDate } from "@/lib/download";
+import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,6 +35,12 @@ export async function POST(request: NextRequest) {
 
     // Create order
     const downloadToken = generateDownloadToken();
+
+    // If customer is logged in, attach userId
+    const session = await auth();
+    const role = (session?.user as { role?: string } | undefined)?.role;
+    const userId = role === "customer" ? session?.user?.id : undefined;
+
     const order = await prisma.order.create({
       data: {
         email,
@@ -43,6 +50,7 @@ export async function POST(request: NextRequest) {
         currency: variant.currency,
         downloadToken,
         downloadExpiresAt: getDownloadExpiryDate(7),
+        ...(userId ? { userId } : {}),
       },
     });
 

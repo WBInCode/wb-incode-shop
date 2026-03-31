@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, User, LogOut } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const t = useTranslations("nav");
   const locale = useLocale();
   const otherLocale = locale === "pl" ? "en" : "pl";
+  const { data: session } = useSession();
+  const isCustomer = session?.user && (session.user as { role?: string }).role === "customer";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -73,6 +77,55 @@ export default function Navbar() {
             >
               {t("templates")}
             </Link>
+
+            {/* Auth */}
+            {isCustomer ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors px-3 py-1.5 border border-white/10 rounded-full hover:border-primary/30 cursor-pointer"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-sm">{session?.user?.name || t("myAccount")}</span>
+                </button>
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="absolute right-0 mt-2 w-48 bg-surface border border-white/10 rounded-xl shadow-xl overflow-hidden z-50"
+                    >
+                      <Link
+                        href={`/${locale}/account`}
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <User className="w-4 h-4" />
+                        {t("myAccount")}
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          signOut({ callbackUrl: `/${locale}` });
+                        }}
+                        className="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        {t("logout")}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                href={`/${locale}/login`}
+                className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-1.5 border border-white/10 rounded-full hover:border-primary/30"
+              >
+                {t("login")}
+              </Link>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -119,6 +172,34 @@ export default function Navbar() {
               >
                 {t("templates")}
               </Link>
+              {isCustomer ? (
+                <>
+                  <Link
+                    href={`/${locale}/account`}
+                    onClick={() => setMobileOpen(false)}
+                    className="block text-gray-400 hover:text-white transition-colors py-2"
+                  >
+                    {t("myAccount")}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      signOut({ callbackUrl: `/${locale}` });
+                    }}
+                    className="block text-gray-400 hover:text-red-400 transition-colors py-2 cursor-pointer"
+                  >
+                    {t("logout")}
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href={`/${locale}/login`}
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-gray-400 hover:text-white transition-colors py-2"
+                >
+                  {t("login")}
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
