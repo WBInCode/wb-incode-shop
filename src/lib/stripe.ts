@@ -18,7 +18,7 @@ export async function createStripeCheckoutSession(
   data: StripeCheckoutRequest
 ): Promise<{ sessionId: string; url: string }> {
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card", "blik", "p24"],
+    payment_method_types: ["card"],
     mode: "payment",
     customer_email: data.buyerEmail,
     metadata: {
