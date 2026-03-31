@@ -20,7 +20,7 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/admin/products", icon: LayoutDashboard },
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Produkty", href: "/admin/products", icon: Package },
   { name: "Zamówienia", href: "/admin/orders", icon: ShoppingCart },
 ];

@@ -65,7 +65,8 @@
     "processing": "Przetwarzanie...",
     "terms": "Kupując akceptujesz nasz",
     "termsLink": "regulamin",
-    "privacyLink": "politykę prywatności"
+    "privacyLink": "politykę prywatności",
+    "error": "Wystąpił błąd. Spróbuj ponownie."
   },
   "success": {
     "title": "Płatność zakończona!",

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { readFile } from "fs/promises";
-import path from "path";
+import { getPayUOrderStatus } from "@/lib/payu";
 
 type Params = Promise<{ token: string }>;
 
@@ -12,7 +11,7 @@ export async function GET(
   try {
     const { token } = await params;
 
-    const order = await prisma.order.findUnique({
+    let order = await prisma.order.findUnique({
       where: { downloadToken: token },
       include: { product: true },
     });
@@ -22,6 +21,27 @@ export async function GET(
         { error: "Invalid download token" },
         { status: 404 }
       );
+    }
+
+    // If order is still PENDING, check PayU for updated status
+    if (order.status === "PENDING" && order.payuOrderId) {
+      const payuStatus = await getPayUOrderStatus(order.payuOrderId);
+      if (payuStatus === "COMPLETED") {
+        order = await prisma.order.update({
+          where: { id: order.id },
+          data: { status: "PAID" },
+          include: { product: true },
+        });
+      } else if (payuStatus === "CANCELED") {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { status: "CANCELLED" },
+        });
+        return NextResponse.json(
+          { error: "Order was cancelled" },
+          { status: 403 }
+        );
+      }
     }
 
     // Check if order is paid
@@ -54,16 +74,23 @@ export async function GET(
       data: { downloadCount: { increment: 1 } },
     });
 
-    // Read and serve the file
-    const filePath = path.join(process.cwd(), "uploads", order.product.fileUrl);
-    const fileBuffer = await readFile(filePath);
-    const fileName = path.basename(order.product.fileUrl);
+    // Fetch file from Blob storage and proxy to client
+    const fileUrl = order.product.fileUrl;
+    const fileResponse = await fetch(fileUrl);
 
-    return new NextResponse(fileBuffer, {
+    if (!fileResponse.ok || !fileResponse.body) {
+      return NextResponse.json(
+        { error: "File not found" },
+        { status: 404 }
+      );
+    }
+
+    const fileName = fileUrl.split("/").pop()?.split("?")[0] || "download.zip";
+
+    return new NextResponse(fileResponse.body, {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="${fileName}"`,
-        "Content-Length": fileBuffer.length.toString(),
       },
     });
   } catch (error) {

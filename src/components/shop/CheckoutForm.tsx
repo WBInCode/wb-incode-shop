@@ -25,12 +25,14 @@ export default function CheckoutForm({
   const locale = useLocale();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -46,8 +48,12 @@ export default function CheckoutForm({
       const data = await res.json();
       if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
+      } else {
+        setError(t("error"));
+        setLoading(false);
       }
     } catch {
+      setError(t("error"));
       setLoading(false);
     }
   };
@@ -103,6 +109,10 @@ export default function CheckoutForm({
               </>
             )}
           </Button>
+
+          {error && (
+            <p className="text-red-400 text-sm text-center mt-2">{error}</p>
+          )}
         </form>
 
         <p className="text-xs text-gray-500 mt-4 text-center">

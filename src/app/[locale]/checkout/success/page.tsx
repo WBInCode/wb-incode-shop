@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import prisma from "@/lib/prisma";
+import { getPayUOrderStatus } from "@/lib/payu";
 import { notFound } from "next/navigation";
 import { CheckCircle2, Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -22,6 +23,23 @@ export default async function CheckoutSuccessPage({
       where: { downloadToken: token },
       include: { product: true, variant: true },
     });
+
+    // If order is PENDING, check PayU for updated status
+    if (order && order.status === "PENDING" && order.payuOrderId) {
+      const payuStatus = await getPayUOrderStatus(order.payuOrderId);
+      if (payuStatus === "COMPLETED") {
+        order = await prisma.order.update({
+          where: { id: order.id },
+          data: { status: "PAID" },
+          include: { product: true, variant: true },
+        });
+      } else if (payuStatus === "CANCELED") {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { status: "CANCELLED" },
+        });
+      }
+    }
   }
 
   return (
