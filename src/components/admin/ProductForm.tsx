@@ -392,8 +392,20 @@ export default function ProductForm({ initialData }: ProductFormProps) {
             <Input
               value={newScreenshotUrl}
               onChange={(e) => setNewScreenshotUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (newScreenshotUrl.trim()) {
+                    setData({
+                      ...data,
+                      screenshots: [...data.screenshots, newScreenshotUrl.trim()],
+                    });
+                    setNewScreenshotUrl("");
+                  }
+                }
+              }}
               placeholder="https://example.com/screenshot.png"
-              className="flex-1"
+              className="flex-1 min-w-0 w-auto"
             />
             <button
               type="button"
@@ -406,7 +418,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                   setNewScreenshotUrl("");
                 }
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm bg-primary/20 border border-primary/30 rounded-xl text-primary hover:bg-primary/30 hover:text-white active:scale-95 transition-all cursor-pointer whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
               Dodaj
