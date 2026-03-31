@@ -24,7 +24,7 @@ export async function createInvoice(data: FakturowniaInvoiceData) {
     sell_date: today,
     issue_date: today,
     payment_to: today,
-    payment_type: "payu",
+    payment_type: "stripe",
     status: "paid",
     paid_date: today,
     seller_name: "WB InCode Sp. z o.o.",

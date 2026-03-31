@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { createPayUOrder } from "@/lib/payu";
+import { createStripeCheckoutSession } from "@/lib/stripe";
 import { generateDownloadToken } from "@/lib/download";
 import { auth } from "@/lib/auth";
 
@@ -63,24 +63,24 @@ export async function POST(request: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const currentLocale = locale || "pl";
 
-    // Create PayU order
-    const payuOrder = await createPayUOrder({
-      extOrderId: order.id,
-      description: locale === "pl" ? product.namePl : product.nameEn,
-      totalAmount: variant.price,
-      currencyCode: variant.currency,
+    // Create Stripe Checkout Session
+    const stripeSession = await createStripeCheckoutSession({
+      orderId: order.id,
+      productName: locale === "pl" ? product.namePl : product.nameEn,
+      amount: variant.price,
+      currency: variant.currency,
       buyerEmail: email,
-      continueUrl: `${appUrl}/${currentLocale}/checkout/success?token=${downloadToken}`,
-      notifyUrl: `${appUrl}/api/payu/notify`,
+      successUrl: `${appUrl}/${currentLocale}/checkout/success?token=${downloadToken}`,
+      cancelUrl: `${appUrl}/${currentLocale}/checkout/cancel`,
     });
 
-    // Update order with PayU order ID
+    // Update order with Stripe session ID
     await prisma.order.update({
       where: { id: order.id },
-      data: { payuOrderId: payuOrder.orderId },
+      data: { stripeSessionId: stripeSession.sessionId },
     });
 
-    return NextResponse.json({ redirectUrl: payuOrder.redirectUri });
+    return NextResponse.json({ redirectUrl: stripeSession.url });
   } catch (error) {
     console.error("Checkout error:", error);
     return NextResponse.json(
