@@ -110,6 +110,24 @@
     "accept": "Akceptuję",
     "reject": "Odrzuć"
   },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Masz pytanie lub potrzebujesz pomocy? Napisz do nas — odpowiemy najszybciej jak to możliwe.",
+    "name": "Imię",
+    "namePlaceholder": "Jan Kowalski",
+    "email": "Adres email",
+    "emailPlaceholder": "twoj@email.pl",
+    "subject": "Temat",
+    "subjectPlaceholder": "W czym możemy pomóc?",
+    "message": "Wiadomość",
+    "messagePlaceholder": "Opisz swoje pytanie lub problem...",
+    "send": "Wyślij wiadomość",
+    "sending": "Wysyłanie...",
+    "success": "Wiadomość została wysłana! Potwierdzenie przesłaliśmy na Twój email.",
+    "error": "Nie udało się wysłać wiadomości. Spróbuj ponownie.",
+    "required": "Wszystkie pola są wymagane.",
+    "invalidEmail": "Podaj poprawny adres email."
+  },
   "faq": {
     "title": "Najczęściej zadawane pytania",
     "subtitle": "Wszystko co musisz wiedzieć o naszych produktach",
