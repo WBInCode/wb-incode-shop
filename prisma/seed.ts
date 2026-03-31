@@ -233,6 +233,50 @@ async function main() {
   });
   console.log("Product created:", product5.namePl);
 
+  const product6 = await prisma.product.upsert({
+    where: { slug: "wp-speed-lite" },
+    update: {},
+    create: {
+      slug: "wp-speed-lite",
+      namePl: "WP Speed Lite – Wtyczka Przyspieszająca WordPress",
+      nameEn: "WP Speed Lite – WordPress Speed Optimization Plugin",
+      descriptionPl:
+        "Prosta, ale potężna wtyczka przyspieszająca Twojego WordPressa. WP Speed Lite oferuje pełny zestaw narzędzi do optymalizacji szybkości strony:\n\n• Cache HTML stron – buforowanie dla gości z konfigurowalnym TTL, osobny cache dla mobile, wykluczenia URL, podgląd i czyszczenie jednym kliknięciem\n• Nagłówki cache przeglądarki – trzy profile: Bezpieczny, Domyślny, Agresywny + automatyczne reguły .htaccess dla Apache\n• Minifikacja HTML, CSS i JS – zmniejsz rozmiar plików i przyspiesz ładowanie strony\n• Łączenie CSS/JS – opcjonalne łączenie plików z możliwością wykluczeń (z zabezpieczeniem w Trybie bezpiecznym)\n• Lazy load obrazków i iframe – opóźnione ładowanie mediów z wykluczeniami i pomijaniem pierwszego obrazka\n• Krytyczny CSS – ręczne wklejanie critical CSS dla natychmiastowego renderowania\n• Preload / Preconnect / DNS-Prefetch – podpowiedzi dla przeglądarki przyspieszające pobieranie zasobów\n• Integracja z CDN – przepinanie URL zasobów na własną domenę CDN\n• Czyszczenie bazy danych – usuwanie rewizji, auto-drafty, kosza i transientów\n• Logi i diagnostyka – pełny dziennik zdarzeń i endpoint diagnostyczny\n\nTrzy presety konfiguracji: Bezpieczny, Rekomendowany i Agresywny – wybierz jednym kliknięciem. Wymaga WordPress 6.0+ i PHP 7.4+.",
+      descriptionEn:
+        "A simple yet powerful plugin to speed up your WordPress site. WP Speed Lite provides a complete toolkit for website performance optimization:\n\n• HTML Page Cache – full-page caching for guests with configurable TTL, separate mobile cache, URL exclusions, preview and one-click purge\n• Browser Cache Headers – three profiles: Safe, Default, Aggressive + automatic .htaccess rules for Apache\n• HTML, CSS & JS Minification – reduce file sizes and speed up page loading\n• CSS/JS Combining – optional file combining with exclusions (restricted in Safe Mode)\n• Lazy Load for Images & Iframes – deferred media loading with exclusions and first-image skip\n• Critical CSS – manually paste critical CSS for instant above-the-fold rendering\n• Preload / Preconnect / DNS-Prefetch – browser resource hints for faster asset fetching\n• CDN Integration – rewrite asset URLs to your CDN domain\n• Database Cleanup – remove revisions, auto-drafts, trash, and transients\n• Logs & Diagnostics – full event log and diagnostic endpoint\n\nThree configuration presets: Safe, Recommended, and Aggressive – set up with one click. Requires WordPress 6.0+ and PHP 7.4+.",
+      categoryPl: "Wtyczki",
+      categoryEn: "Plugins",
+      technologies: JSON.stringify(["WordPress", "PHP", "Apache", ".htaccess", "CDN", "HTML Cache"]),
+      screenshots: JSON.stringify([
+        "https://placehold.co/800x500/0a0a0a/30e87a?text=WP+Speed+Lite+Dashboard",
+        "https://placehold.co/800x500/121212/30e87a?text=Cache+Settings",
+        "https://placehold.co/800x500/0a0a0a/30e87a?text=CSS+JS+Minification",
+      ]),
+      fileUrl: "products/wp-speed-lite.zip",
+      featured: true,
+      active: true,
+      variants: {
+        create: [
+          {
+            namePl: "Licencja Standard",
+            nameEn: "Standard License",
+            descriptionPl: "1 strona WordPress, aktualizacje przez 12 miesięcy.",
+            descriptionEn: "1 WordPress site, 12 months of updates.",
+            price: 4900,
+          },
+          {
+            namePl: "Licencja Agency",
+            nameEn: "Agency License",
+            descriptionPl: "Bez limitu stron, priorytetowe wsparcie, aktualizacje przez 12 miesięcy.",
+            descriptionEn: "Unlimited sites, priority support, 12 months of updates.",
+            price: 14900,
+          },
+        ],
+      },
+    },
+  });
+  console.log("Product created:", product6.namePl);
+
   console.log("Seed complete!");
 }
 
