@@ -86,7 +86,7 @@ export default function PageTransition() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15, exit: { duration: 0.2 } }}
+            transition={{ duration: 0.15 }}
           >
             <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
           </motion.div>
