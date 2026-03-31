@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import RetroGrid from "@/components/ui/RetroGrid";
+import Scene3DBackground from "@/components/ui/Scene3DBackground";
 
 export default function Hero() {
   const t = useTranslations("hero");
@@ -13,6 +14,7 @@ export default function Hero() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       <RetroGrid />
+      <Scene3DBackground />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24">
         {/* Badge */}
