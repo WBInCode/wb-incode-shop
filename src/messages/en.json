@@ -97,6 +97,24 @@
     "accept": "Accept",
     "reject": "Reject"
   },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Have a question or need help? Send us a message — we'll respond as soon as possible.",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "email": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "How can we help?",
+    "message": "Message",
+    "messagePlaceholder": "Describe your question or issue...",
+    "send": "Send message",
+    "sending": "Sending...",
+    "success": "Message sent! A confirmation has been sent to your email.",
+    "error": "Failed to send the message. Please try again.",
+    "required": "All fields are required.",
+    "invalidEmail": "Please enter a valid email address."
+  },
   "faq": {
     "title": "Frequently Asked Questions",
     "subtitle": "Everything you need to know about our products",

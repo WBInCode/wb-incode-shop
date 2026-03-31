@@ -40,6 +40,12 @@ export default function Footer() {
               >
                 {useTranslations("nav")("templates")}
               </Link>
+              <Link
+                href={`/${locale}/kontakt`}
+                className="block text-gray-400 text-sm hover:text-primary transition-colors"
+              >
+                {t("contact")}
+              </Link>
             </div>
           </div>
 
