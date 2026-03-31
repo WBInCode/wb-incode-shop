@@ -49,14 +49,11 @@ export default async function AccountPurchasesPage() {
               <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">{t("variant")}</th>
               <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">{t("amount")}</th>
               <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">{t("date")}</th>
-              <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">{t("downloads")}</th>
               <th className="text-left text-gray-400 text-sm font-medium py-4 px-6"></th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => {
-              const isExpired = order.downloadExpiresAt < new Date();
-              const canDownload = !isExpired && order.downloadCount < order.maxDownloads;
+            {orders.map((order: typeof orders[number]) => {
               const productName = locale === "en" ? order.product.nameEn : order.product.namePl;
               const variantName = locale === "en" ? order.variant.nameEn : order.variant.namePl;
 
@@ -68,21 +65,14 @@ export default async function AccountPurchasesPage() {
                   <td className="py-4 px-6 text-gray-500 text-sm">
                     {new Date(order.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "pl-PL")}
                   </td>
-                  <td className="py-4 px-6 text-gray-400 text-sm">
-                    {order.downloadCount}/{order.maxDownloads}
-                  </td>
                   <td className="py-4 px-6">
-                    {canDownload ? (
-                      <a
-                        href={`/api/download/${order.downloadToken}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-medium rounded-lg hover:bg-primary/20 transition-colors"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        {t("download")}
-                      </a>
-                    ) : (
-                      <span className="text-xs text-gray-600">{t("expired")}</span>
-                    )}
+                    <a
+                      href={`/api/download/${order.downloadToken}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-medium rounded-lg hover:bg-primary/20 transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      {t("download")}
+                    </a>
                   </td>
                 </tr>
               );

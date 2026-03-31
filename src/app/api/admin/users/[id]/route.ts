@@ -38,14 +38,12 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
     createdAt: user.createdAt,
     ordersCount: paidOrders.length,
     totalSpent: paidOrders.reduce((sum: number, o: { amount: number }) => sum + o.amount, 0),
-    orders: user.orders.map((o: { id: string; product: { namePl: string }; variant: { namePl: string }; amount: number; status: string; downloadCount: number; maxDownloads: number; createdAt: Date }) => ({
+    orders: user.orders.map((o: { id: string; product: { namePl: string }; variant: { namePl: string }; amount: number; status: string; createdAt: Date }) => ({
       id: o.id,
       productName: o.product.namePl,
       variantName: o.variant.namePl,
       amount: o.amount,
       status: o.status,
-      downloadCount: o.downloadCount,
-      maxDownloads: o.maxDownloads,
       createdAt: o.createdAt,
     })),
   });

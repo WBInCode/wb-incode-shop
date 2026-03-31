@@ -26,11 +26,10 @@ export default async function AccountLicensesPage() {
 
   return (
     <div className="space-y-4">
-      {orders.map((order) => {
+      {orders.map((order: typeof orders[number]) => {
         const productName = locale === "en" ? order.product.nameEn : order.product.namePl;
         const variantName = locale === "en" ? order.variant.nameEn : order.variant.namePl;
         const isPersonal = variantName.toLowerCase().includes("personal");
-        const isExpired = order.downloadExpiresAt < new Date();
 
         return (
           <div
@@ -58,14 +57,8 @@ export default async function AccountLicensesPage() {
                 <p className="text-gray-500 text-xs mt-1">
                   {new Date(order.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "pl-PL")}
                 </p>
-                <span
-                  className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium mt-2 ${
-                    isExpired
-                      ? "bg-red-400/10 text-red-400"
-                      : "bg-emerald-400/10 text-emerald-400"
-                  }`}
-                >
-                  {isExpired ? t("licenseExpired") : t("licenseActive")}
+                <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium mt-2 bg-emerald-400/10 text-emerald-400">
+                  {t("licenseActive")}
                 </span>
               </div>
             </div>
