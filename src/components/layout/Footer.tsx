@@ -1,8 +1,8 @@
 "use client";
 
-import { ShoppingBag } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -15,7 +15,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <ShoppingBag className="w-7 h-7 text-primary" />
+              <Image
+                src="/logo/WB InCode.png"
+                alt="WB InCode Shop"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
               <span className="text-xl font-bold text-white">
                 WB <span className="text-primary">InCode</span>
                 <span className="text-gray-500 text-sm ml-1">Shop</span>

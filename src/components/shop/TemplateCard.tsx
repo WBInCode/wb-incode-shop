@@ -53,10 +53,11 @@ export default function TemplateCard({ product, index = 0 }: TemplateCardProps) 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="h-full"
     >
       <Link
         href={`/${locale}/templates/${product.slug}`}
-        className="group block rounded-2xl bg-surface border border-white/5 overflow-hidden hover:border-primary/20 transition-all duration-500"
+        className="group flex flex-col h-full rounded-2xl bg-surface border border-white/5 overflow-hidden hover:border-primary/20 transition-all duration-500"
       >
         {/* Image */}
         <div className={`relative h-52 overflow-hidden bg-gradient-to-br ${gradient}`}>
@@ -82,13 +83,13 @@ export default function TemplateCard({ product, index = 0 }: TemplateCardProps) 
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-1">
           <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
             {name}
           </h3>
 
           {/* Technologies */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4 flex-1">
             {product.technologies.slice(0, 3).map((tech) => (
               <span
                 key={tech}
