@@ -69,7 +69,20 @@
     "terms": "Kupując akceptujesz nasz",
     "termsLink": "regulamin",
     "privacyLink": "politykę prywatności",
-    "error": "Wystąpił błąd. Spróbuj ponownie."
+    "error": "Wystąpił błąd. Spróbuj ponownie.",
+    "wantInvoice": "Chcę fakturę VAT",
+    "companyName": "Nazwa firmy",
+    "companyNamePlaceholder": "Firma Sp. z o.o.",
+    "companyNip": "NIP",
+    "companyNipPlaceholder": "1234567890",
+    "companyAddress": "Adres firmy",
+    "companyAddressPlaceholder": "ul. Przyk\u0142adowa 1, 00-000 Warszawa",
+    "companyTab": "Firma",
+    "personTab": "Osoba prywatna",
+    "personName": "Imi\u0119 i nazwisko",
+    "personNamePlaceholder": "Jan Kowalski",
+    "personAddress": "Adres zamieszkania",
+    "personAddressPlaceholder": "ul. Przyk\u0142adowa 1, 00-000 Warszawa"
   },
   "success": {
     "title": "Płatność zakończona!",

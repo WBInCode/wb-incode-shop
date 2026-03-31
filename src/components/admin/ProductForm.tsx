@@ -291,13 +291,13 @@ export default function ProductForm({ initialData }: ProductFormProps) {
               required
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
             >
-              <option value="" disabled>Wybierz kategorię</option>
-              <option value="Szablon Strony">Szablon Strony</option>
-              <option value="Szablony Strony WordPress">Szablony Strony WordPress</option>
-              <option value="Wtyczki">Wtyczki</option>
-              <option value="Skrypty">Skrypty</option>
-              <option value="Narzędzia">Narzędzia</option>
-              <option value="Twój Pomysł">Twój Pomysł</option>
+              <option value="" disabled className="bg-[#1a1a1a] text-white">Wybierz kategorię</option>
+              <option value="Szablon Strony" className="bg-[#1a1a1a] text-white">Szablon Strony</option>
+              <option value="Szablony Strony WordPress" className="bg-[#1a1a1a] text-white">Szablony Strony WordPress</option>
+              <option value="Wtyczki" className="bg-[#1a1a1a] text-white">Wtyczki</option>
+              <option value="Skrypty" className="bg-[#1a1a1a] text-white">Skrypty</option>
+              <option value="Narzędzia" className="bg-[#1a1a1a] text-white">Narzędzia</option>
+              <option value="Twój Pomysł" className="bg-[#1a1a1a] text-white">Twój Pomysł</option>
             </select>
           </div>
 

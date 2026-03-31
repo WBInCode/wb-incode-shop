@@ -59,6 +59,8 @@ body {
 .glass-nav {
   background: #0a0a0a !important;
   backdrop-filter: blur(12px);
+  border: none !important;
+  border-bottom: none !important;
 }
 
 @keyframes grid {

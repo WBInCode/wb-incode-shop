@@ -2,6 +2,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getPayUOrderStatus } from "@/lib/payu";
+import { createInvoice } from "@/lib/fakturownia";
 import { CheckCircle2, XCircle, Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -45,6 +46,41 @@ export default async function CheckoutSuccessPage({
             include: { product: true, variant: true },
           });
           isPaid = true;
+
+          // Create invoice in Fakturownia (only if not already created)
+          if (!order.invoiceCreated) {
+            try {
+              const isCompanyInvoice = order.wantInvoice && order.isCompany;
+              const isPersonInvoice = order.wantInvoice && !order.isCompany;
+              await createInvoice({
+                buyerName: isCompanyInvoice && order.companyName
+                  ? order.companyName
+                  : isPersonInvoice && order.personName
+                    ? order.personName
+                    : order.email,
+                buyerEmail: order.email,
+                buyerTaxNo: isCompanyInvoice && order.companyNip ? order.companyNip : undefined,
+                buyerAddress: isCompanyInvoice && order.companyAddress
+                  ? order.companyAddress
+                  : isPersonInvoice && order.personAddress
+                    ? order.personAddress
+                    : undefined,
+                isCompany: order.wantInvoice ? order.isCompany : undefined,
+                productName: order.product.namePl,
+                quantity: 1,
+                totalPriceGross: order.amount / 100,
+                tax: 23,
+                orderId: order.id,
+                kind: order.wantInvoice ? "vat" : "receipt",
+              });
+              await prisma.order.update({
+                where: { id: order.id },
+                data: { invoiceCreated: true },
+              });
+            } catch (invoiceError) {
+              console.error("Failed to create Fakturownia invoice:", invoiceError);
+            }
+          }
         } else if (
           payuStatus === "CANCELED" ||
           payuStatus === "REJECTED" ||

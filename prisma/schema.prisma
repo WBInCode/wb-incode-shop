@@ -67,6 +67,14 @@ model Order {
   status            OrderStatus @default(PENDING)
   payuOrderId       String?     @unique
   downloadToken     String      @unique
+  invoiceCreated    Boolean     @default(false)
+  wantInvoice       Boolean     @default(false)
+  isCompany         Boolean     @default(true)
+  companyName       String?
+  companyNip        String?
+  companyAddress    String?
+  personName        String?
+  personAddress     String?
   createdAt         DateTime    @default(now())
 
   product           Product     @relation(fields: [productId], references: [id])
