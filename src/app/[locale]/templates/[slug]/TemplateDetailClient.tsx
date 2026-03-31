@@ -66,21 +66,28 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
   return (
     <div>
       {/* Back link */}
-      <Link
-        href={`/${locale}/templates`}
-        className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        <ArrowLeft className="w-4 h-4" />
-        {t("back")}
-      </Link>
+        <Link
+          href={`/${locale}/templates`}
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t("back")}
+        </Link>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
         {/* Left: screenshots + video + description */}
         <div className="lg:col-span-3">
           {/* Main screenshot / placeholder */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
             className="rounded-2xl overflow-hidden border border-white/10 mb-4"
           >
             {hasScreenshots ? (
@@ -169,24 +176,40 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
           )}
 
           {/* Description */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+          >
             <h3 className="text-xl font-bold text-white mb-4">{t("description")}</h3>
             <p className="text-gray-400 leading-relaxed whitespace-pre-line">
               {description}
             </p>
-          </div>
+          </motion.div>
 
           {/* Technologies */}
-          <div className="mt-8">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.45, ease: "easeOut" }}
+            className="mt-8"
+          >
             <h3 className="text-xl font-bold text-white mb-4">{t("technologies")}</h3>
             <div className="flex flex-wrap gap-3">
-              {product.technologies.map((tech) => (
-                <Badge key={tech} variant="outline">
-                  {tech}
-                </Badge>
+              {product.technologies.map((tech, i) => (
+                <motion.span
+                  key={tech}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.5 + i * 0.05, ease: "easeOut" }}
+                >
+                  <Badge variant="outline">
+                    {tech}
+                  </Badge>
+                </motion.span>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Right: pricing + checkout */}
@@ -194,8 +217,9 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
           <div className="sticky top-28">
             {/* Title & category */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
               className="mb-6"
             >
               <Badge variant="primary" className="mb-3">
@@ -205,20 +229,25 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
             </motion.div>
 
             {/* Pricing variants */}
-            <div className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35, ease: "easeOut" }}
+              className="mb-8"
+            >
               <PricingVariants
                 variants={product.variants}
                 selectedId={selectedVariantId}
                 onSelect={setSelectedVariantId}
               />
-            </div>
+            </motion.div>
 
             {/* Checkout form */}
             {selectedVariant && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
                 <CheckoutForm
                   productSlug={product.slug}
