@@ -273,22 +273,32 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Kategoria (PL)</label>
-            <Input
+            <label className="block text-sm text-gray-400 mb-2">Kategoria</label>
+            <select
               value={data.categoryPl}
-              onChange={(e) => setData({ ...data, categoryPl: e.target.value })}
-              placeholder="Landing Page"
+              onChange={(e) => {
+                const val = e.target.value;
+                const map: Record<string, string> = {
+                  "Szablon Strony": "Website Template",
+                  "Szablony Strony WordPress": "WordPress Templates",
+                  "Wtyczki": "Plugins",
+                  "Skrypty": "Scripts",
+                  "Narzędzia": "Tools",
+                  "Twój Pomysł": "Your Idea",
+                };
+                setData({ ...data, categoryPl: val, categoryEn: map[val] || val });
+              }}
               required
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Kategoria (EN)</label>
-            <Input
-              value={data.categoryEn}
-              onChange={(e) => setData({ ...data, categoryEn: e.target.value })}
-              placeholder="Landing Page"
-              required
-            />
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+            >
+              <option value="" disabled>Wybierz kategorię</option>
+              <option value="Szablon Strony">Szablon Strony</option>
+              <option value="Szablony Strony WordPress">Szablony Strony WordPress</option>
+              <option value="Wtyczki">Wtyczki</option>
+              <option value="Skrypty">Skrypty</option>
+              <option value="Narzędzia">Narzędzia</option>
+              <option value="Twój Pomysł">Twój Pomysł</option>
+            </select>
           </div>
 
           <div className="md:col-span-2">
