@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { createPayUOrder } from "@/lib/payu";
-import { generateDownloadToken, getDownloadExpiryDate } from "@/lib/download";
+import { generateDownloadToken } from "@/lib/download";
 import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
         amount: variant.price,
         currency: variant.currency,
         downloadToken,
-        downloadExpiresAt: getDownloadExpiryDate(7),
         ...(userId ? { userId } : {}),
       },
     });

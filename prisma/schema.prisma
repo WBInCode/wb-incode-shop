@@ -67,9 +67,6 @@ model Order {
   status            OrderStatus @default(PENDING)
   payuOrderId       String?     @unique
   downloadToken     String      @unique
-  downloadCount     Int         @default(0)
-  maxDownloads      Int         @default(5)
-  downloadExpiresAt DateTime
   createdAt         DateTime    @default(now())
 
   product           Product     @relation(fields: [productId], references: [id])
@@ -91,6 +88,7 @@ model User {
   email         String    @unique
   passwordHash  String
   name          String
+  isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   orders        Order[]

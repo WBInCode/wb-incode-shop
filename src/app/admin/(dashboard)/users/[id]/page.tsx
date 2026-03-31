@@ -3,6 +3,7 @@ import { formatPrice } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Calendar, ShoppingCart } from "lucide-react";
+import UserActions from "@/components/admin/UserActions";
 
 type Params = Promise<{ id: string }>;
 
@@ -46,7 +47,16 @@ export default async function AdminUserDetailPage({ params }: { params: Params }
             </span>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">{user.name || "Brak nazwy"}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-white">{user.name || "Brak nazwy"}</h1>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                user.isActive
+                  ? "bg-green-500/10 text-green-400"
+                  : "bg-red-500/10 text-red-400"
+              }`}>
+                {user.isActive ? "Aktywny" : "Nieaktywny"}
+              </span>
+            </div>
             <p className="text-gray-400 text-sm flex items-center gap-1.5">
               <Mail className="w-4 h-4" /> {user.email}
             </p>
@@ -76,6 +86,14 @@ export default async function AdminUserDetailPage({ params }: { params: Params }
           </div>
         </div>
       </div>
+
+      {/* Admin actions */}
+      <UserActions
+        userId={user.id}
+        userName={user.name}
+        userEmail={user.email}
+        isActive={user.isActive}
+      />
 
       {/* Orders */}
       <h2 className="text-lg font-bold text-white mb-4">Historia zamówień</h2>

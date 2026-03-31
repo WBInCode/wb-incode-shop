@@ -18,6 +18,7 @@ export default async function AdminUsersPage() {
     id: user.id,
     email: user.email,
     name: user.name,
+    isActive: user.isActive,
     createdAt: user.createdAt,
     ordersCount: user.orders.length,
     totalSpent: user.orders.reduce((sum: number, o: { amount: number }) => sum + o.amount, 0),
@@ -41,6 +42,7 @@ export default async function AdminUsersPage() {
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">Imię</th>
+                  <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">Status</th>
                   <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">Email</th>
                   <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">Zakupy</th>
                   <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">Wydano</th>
@@ -55,6 +57,15 @@ export default async function AdminUsersPage() {
                     className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]"
                   >
                     <td className="py-4 px-6 text-white text-sm font-medium">{user.name}</td>
+                    <td className="py-4 px-6">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        user.isActive
+                          ? "bg-green-500/10 text-green-400"
+                          : "bg-red-500/10 text-red-400"
+                      }`}>
+                        {user.isActive ? "Aktywny" : "Nieaktywny"}
+                      </span>
+                    </td>
                     <td className="py-4 px-6 text-gray-400 text-sm">{user.email}</td>
                     <td className="py-4 px-6 text-gray-400 text-sm">{user.ordersCount}</td>
                     <td className="py-4 px-6 text-primary font-medium text-sm">
