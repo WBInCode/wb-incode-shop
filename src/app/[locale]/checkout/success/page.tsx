@@ -91,7 +91,6 @@ export default async function CheckoutSuccessPage({
   if (order && !isPaid) {
     redirect(`/${locale}/checkout/cancel`);
   }
-  }
 
   // No valid token at all
   if (!token || !order) {
