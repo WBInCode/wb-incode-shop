@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendContactEmail, sendContactConfirmation } from "@/lib/email";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// ReDoS-safe: anchored, no nested quantifiers, bounded repetition
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]{1,64}@[a-zA-Z0-9.\-]{1,253}\.[a-zA-Z]{2,63}$/;
 
 export async function POST(req: NextRequest) {
   try {
