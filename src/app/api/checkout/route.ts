@@ -6,7 +6,7 @@ import { generateDownloadToken, getDownloadExpiryDate } from "@/lib/download";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, productSlug, variantId, locale } = body;
+    const { email, productSlug, variantId, locale, wantInvoice, isCompany, companyName, companyNip, companyAddress, personName, personAddress } = body;
 
     if (!email || !productSlug || !variantId) {
       return NextResponse.json(
@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
         currency: variant.currency,
         downloadToken,
         downloadExpiresAt: getDownloadExpiryDate(7),
+        wantInvoice: wantInvoice || false,
+        isCompany: wantInvoice ? (isCompany ?? true) : true,
+        companyName: wantInvoice && isCompany ? companyName : null,
+        companyNip: wantInvoice && isCompany ? companyNip : null,
+        companyAddress: wantInvoice && isCompany ? companyAddress : null,
+        personName: wantInvoice && !isCompany ? personName : null,
+        personAddress: wantInvoice && !isCompany ? personAddress : null,
       },
     });
 

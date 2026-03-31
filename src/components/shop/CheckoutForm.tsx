@@ -24,6 +24,13 @@ export default function CheckoutForm({
   const t = useTranslations("checkout");
   const locale = useLocale();
   const [email, setEmail] = useState("");
+  const [wantInvoice, setWantInvoice] = useState(false);
+  const [isCompany, setIsCompany] = useState(true);
+  const [companyName, setCompanyName] = useState("");
+  const [companyNip, setCompanyNip] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [personName, setPersonName] = useState("");
+  const [personAddress, setPersonAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -42,6 +49,9 @@ export default function CheckoutForm({
           productSlug,
           variantId,
           locale,
+          wantInvoice,
+          ...(wantInvoice && isCompany && { companyName, companyNip, companyAddress }),
+          ...(wantInvoice && !isCompany && { personName, personAddress }),
         }),
       });
 
@@ -89,6 +99,102 @@ export default function CheckoutForm({
               required
             />
             <p className="text-xs text-gray-500 mt-2">{t("emailHint")}</p>
+          </div>
+
+          {/* Invoice option */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={wantInvoice}
+                onChange={(e) => setWantInvoice(e.target.checked)}
+                className="w-4 h-4 accent-primary rounded"
+              />
+              <span className="text-sm text-gray-300">{t("wantInvoice")}</span>
+            </label>
+
+            {wantInvoice && (
+              <div className="mt-4 space-y-3">
+                {/* Company / Person toggle */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCompany(true)}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isCompany
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-white/5 text-gray-400 border border-white/10"
+                    }`}
+                  >
+                    {t("companyTab")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsCompany(false)}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      !isCompany
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-white/5 text-gray-400 border border-white/10"
+                    }`}
+                  >
+                    {t("personTab")}
+                  </button>
+                </div>
+
+                {isCompany ? (
+                  <>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">{t("companyName")}</label>
+                      <Input
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        placeholder={t("companyNamePlaceholder")}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">{t("companyNip")}</label>
+                      <Input
+                        value={companyNip}
+                        onChange={(e) => setCompanyNip(e.target.value)}
+                        placeholder={t("companyNipPlaceholder")}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">{t("companyAddress")}</label>
+                      <Input
+                        value={companyAddress}
+                        onChange={(e) => setCompanyAddress(e.target.value)}
+                        placeholder={t("companyAddressPlaceholder")}
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">{t("personName")}</label>
+                      <Input
+                        value={personName}
+                        onChange={(e) => setPersonName(e.target.value)}
+                        placeholder={t("personNamePlaceholder")}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">{t("personAddress")}</label>
+                      <Input
+                        value={personAddress}
+                        onChange={(e) => setPersonAddress(e.target.value)}
+                        placeholder={t("personAddressPlaceholder")}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           <Button

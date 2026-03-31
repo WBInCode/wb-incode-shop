@@ -69,6 +69,14 @@ model Order {
   downloadCount     Int         @default(0)
   maxDownloads      Int         @default(5)
   downloadExpiresAt DateTime
+  invoiceCreated    Boolean     @default(false)
+  wantInvoice       Boolean     @default(false)
+  isCompany         Boolean     @default(true)
+  companyName       String?
+  companyNip        String?
+  companyAddress    String?
+  personName        String?
+  personAddress     String?
   createdAt         DateTime    @default(now())
 
   product           Product     @relation(fields: [productId], references: [id])

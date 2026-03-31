@@ -66,7 +66,20 @@
     "terms": "By purchasing you agree to our",
     "termsLink": "terms of service",
     "privacyLink": "privacy policy",
-    "error": "An error occurred. Please try again."
+    "error": "An error occurred. Please try again.",
+    "wantInvoice": "I want a VAT invoice",
+    "companyName": "Company name",
+    "companyNamePlaceholder": "Company Ltd.",
+    "companyNip": "Tax ID (NIP)",
+    "companyNipPlaceholder": "1234567890",
+    "companyAddress": "Company address",
+    "companyAddressPlaceholder": "123 Main St, City",
+    "companyTab": "Company",
+    "personTab": "Individual",
+    "personName": "Full name",
+    "personNamePlaceholder": "John Doe",
+    "personAddress": "Home address",
+    "personAddressPlaceholder": "123 Main St, City"
   },
   "success": {
     "title": "Payment complete!",
