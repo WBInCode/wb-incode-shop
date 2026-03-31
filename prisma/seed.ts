@@ -258,17 +258,10 @@ async function main() {
       variants: {
         create: [
           {
-            namePl: "Licencja Standard",
-            nameEn: "Standard License",
-            descriptionPl: "1 strona WordPress, aktualizacje przez 12 miesięcy.",
-            descriptionEn: "1 WordPress site, 12 months of updates.",
-            price: 4900,
-          },
-          {
-            namePl: "Licencja Agency",
-            nameEn: "Agency License",
-            descriptionPl: "Bez limitu stron, priorytetowe wsparcie, aktualizacje przez 12 miesięcy.",
-            descriptionEn: "Unlimited sites, priority support, 12 months of updates.",
+            namePl: "Pełna licencja",
+            nameEn: "Full License",
+            descriptionPl: "Jednorazowy zakup, bez limitu stron, dożywotni dostęp.",
+            descriptionEn: "One-time purchase, unlimited sites, lifetime access.",
             price: 14900,
           },
         ],
