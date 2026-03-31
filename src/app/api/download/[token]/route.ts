@@ -52,28 +52,6 @@ export async function GET(
       );
     }
 
-    // Check download expiry
-    if (new Date() > order.downloadExpiresAt) {
-      return NextResponse.json(
-        { error: "Download link has expired" },
-        { status: 410 }
-      );
-    }
-
-    // Check download count
-    if (order.downloadCount >= order.maxDownloads) {
-      return NextResponse.json(
-        { error: "Maximum download limit reached" },
-        { status: 429 }
-      );
-    }
-
-    // Increment download count
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { downloadCount: { increment: 1 } },
-    });
-
     // Fetch file from Blob storage and proxy to client
     const fileUrl = order.product.fileUrl;
     const fileResponse = await fetch(fileUrl);

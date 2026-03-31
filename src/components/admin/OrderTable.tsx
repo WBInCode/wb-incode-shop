@@ -11,8 +11,6 @@ interface Order {
   currency: string;
   status: string;
   downloadToken: string;
-  downloadCount: number;
-  maxDownloads: number;
   createdAt: Date;
   product: { namePl: string };
   variant: { namePl: string };
@@ -96,9 +94,6 @@ export default function OrderTable({ orders }: OrderTableProps) {
                     Status
                   </th>
                   <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">
-                    Pobrania
-                  </th>
-                  <th className="text-left text-gray-400 text-sm font-medium py-4 px-6">
                     Data
                   </th>
                 </tr>
@@ -129,9 +124,6 @@ export default function OrderTable({ orders }: OrderTableProps) {
                       >
                         {order.status}
                       </span>
-                    </td>
-                    <td className="py-4 px-6 text-gray-400 text-sm">
-                      {order.downloadCount}/{order.maxDownloads}
                     </td>
                     <td className="py-4 px-6 text-gray-500 text-sm">
                       {new Date(order.createdAt).toLocaleDateString("pl-PL")}

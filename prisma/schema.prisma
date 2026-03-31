@@ -61,14 +61,12 @@ model Order {
   email             String
   productId         String
   variantId         String
+  userId            String?
   amount            Int         // amount in grosze
   currency          String      @default("PLN")
   status            OrderStatus @default(PENDING)
   payuOrderId       String?     @unique
   downloadToken     String      @unique
-  downloadCount     Int         @default(0)
-  maxDownloads      Int         @default(5)
-  downloadExpiresAt DateTime
   invoiceCreated    Boolean     @default(false)
   wantInvoice       Boolean     @default(false)
   isCompany         Boolean     @default(true)
@@ -81,6 +79,7 @@ model Order {
 
   product           Product     @relation(fields: [productId], references: [id])
   variant           Variant     @relation(fields: [variantId], references: [id])
+  user              User?       @relation(fields: [userId], references: [id])
 }
 
 model Admin {
@@ -90,4 +89,23 @@ model Admin {
   name          String
   role          AdminRole @default(ADMIN)
   createdAt     DateTime  @default(now())
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
