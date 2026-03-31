@@ -71,6 +71,18 @@ export default function Footer() {
               >
                 {t("terms")}
               </Link>
+              <Link
+                href={`/${locale}/zwroty`}
+                className="block text-gray-400 text-sm hover:text-primary transition-colors"
+              >
+                {t("returns")}
+              </Link>
+              <Link
+                href={`/${locale}/licencja`}
+                className="block text-gray-400 text-sm hover:text-primary transition-colors"
+              >
+                {t("license")}
+              </Link>
             </div>
           </div>
         </div>
