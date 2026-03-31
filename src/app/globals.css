@@ -34,8 +34,14 @@
   scroll-behavior: smooth;
 }
 
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #0a0a0a !important;
+  overscroll-behavior: none !important;
+}
+
 body {
-  background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -51,7 +57,7 @@ body {
 }
 
 .glass-nav {
-  background: rgba(10, 10, 10, 0.7);
+  background: #0a0a0a !important;
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }

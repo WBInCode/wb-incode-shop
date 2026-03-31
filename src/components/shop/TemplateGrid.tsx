@@ -34,7 +34,14 @@ export default function TemplateGrid({ products }: TemplateGridProps) {
     const cats = new Set(
       products.map((p) => (locale === "pl" ? p.categoryPl : p.categoryEn))
     );
-    return Array.from(cats);
+    const preferredOrder = locale === "pl"
+      ? ["Szablon Strony", "Szablony Strony WordPress", "Wtyczki", "Skrypty", "Narzędzia", "Twój Pomysł"]
+      : ["Website Template", "WordPress Templates", "Plugins", "Scripts", "Tools", "Your Idea"];
+    return Array.from(cats).sort((a, b) => {
+      const idxA = preferredOrder.indexOf(a);
+      const idxB = preferredOrder.indexOf(b);
+      return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+    });
   }, [products, locale]);
 
   const filtered = useMemo(() => {
