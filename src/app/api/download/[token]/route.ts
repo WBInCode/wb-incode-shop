@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getPayUOrderStatus } from "@/lib/payu";
+import { getStripeSession } from "@/lib/stripe";
 
 type Params = Promise<{ token: string }>;
 
@@ -23,16 +23,16 @@ export async function GET(
       );
     }
 
-    // If order is still PENDING, check PayU for updated status
-    if (order.status === "PENDING" && order.payuOrderId) {
-      const payuStatus = await getPayUOrderStatus(order.payuOrderId);
-      if (payuStatus === "COMPLETED") {
+    // If order is still PENDING, check Stripe for updated status
+    if (order.status === "PENDING" && order.stripeSessionId) {
+      const session = await getStripeSession(order.stripeSessionId);
+      if (session?.payment_status === "paid") {
         order = await prisma.order.update({
           where: { id: order.id },
           data: { status: "PAID" },
           include: { product: true },
         });
-      } else if (payuStatus === "CANCELED") {
+      } else if (session?.status === "expired") {
         await prisma.order.update({
           where: { id: order.id },
           data: { status: "CANCELLED" },

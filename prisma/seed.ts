@@ -270,6 +270,50 @@ async function main() {
   });
   console.log("Product created:", product6.namePl);
 
+  const product7 = await prisma.product.upsert({
+    where: { slug: "phone-case-configurator" },
+    update: {},
+    create: {
+      slug: "phone-case-configurator",
+      namePl: "Konfigurator Etui na Telefon – Szablon React",
+      nameEn: "Phone Case Configurator – React Template",
+      descriptionPl:
+        "Gotowy szablon e-commerce do personalizacji etui na telefon. Nowoczesna aplikacja React z konfiguratorem produktu w czasie rzeczywistym, koszykiem i procesem zamówień.\n\n• Konfigurator produktu – wybór koloru, materiału, ramki z podglądem na żywo\n• Upload grafiki – wgrywanie własnych zdjęć ze skalowaniem, obrotem i pozycjonowaniem\n• Personalizacja tekstu – dodawanie napisów z wyborem koloru i rozmiaru\n• Udostępnianie projektów – link z zakodowaną konfiguracją (base64)\n• Koszyk zakupowy – podsumowanie ceny, zarządzanie ilością\n• Checkout – kompletny UI zamówienia z adresem, dostawą i płatnością\n• Konta użytkowników – logowanie/rejestracja z zarządzaniem sesją\n• 13+ stron – Home, Galeria, Konfigurator, FAQ, O nas, Kontakt, Regulamin, Polityka prywatności, Zwroty i więcej\n• Tryb ciemny – wbudowany dark theme z CSS variables\n• Responsywność – pełna optymalizacja na mobile, tablet i desktop\n• Animacje – płynne przejścia i micro-interakcje Framer Motion\n• Polski UI – cała treść po polsku, łatwa do przetłumaczenia\n\nTech stack: React 19, Vite 7, TypeScript 5.9, Tailwind CSS 4, Zustand, Framer Motion, React Router 7, Zod. Gotowy do wdrożenia na Vercel.",
+      descriptionEn:
+        "A ready-made e-commerce template for phone case personalization. A modern React application with a real-time product configurator, shopping cart, and checkout flow.\n\n• Product Configurator – color, material, frame selection with live preview\n• Image Upload – upload custom images with scale, rotation, and positioning controls\n• Text Personalization – add custom text with color and size options\n• Share Designs – share configurations via URL (base64-encoded state)\n• Shopping Cart – pricing summary with quantity management\n• Checkout Flow – complete order UI with address, shipping, and payment steps\n• User Accounts – login/register modals with auth state management\n• 13+ Pages – Home, Gallery, Configurator, FAQ, About, Contact, Terms, Privacy, Returns and more\n• Dark Mode – built-in dark theme with CSS variables\n• Responsive Design – fully optimized for mobile, tablet, and desktop\n• Smooth Animations – Framer Motion powered transitions and micro-interactions\n• Polish UI – all content in Polish, easily translatable\n\nTech stack: React 19, Vite 7, TypeScript 5.9, Tailwind CSS 4, Zustand, Framer Motion, React Router 7, Zod. Ready to deploy on Vercel.",
+      categoryPl: "Szablon Strony",
+      categoryEn: "Website Template",
+      technologies: JSON.stringify(["React", "Vite", "TypeScript", "Tailwind CSS", "Zustand", "Framer Motion", "React Router"]),
+      screenshots: JSON.stringify([
+        "https://placehold.co/800x500/0a0a0a/30e87a?text=Konfigurator+Etui",
+        "https://placehold.co/800x500/121212/30e87a?text=Podglad+Na+Zywo",
+        "https://placehold.co/800x500/0a0a0a/30e87a?text=Checkout+Flow",
+      ]),
+      fileUrl: "products/phone-case-configurator.zip",
+      featured: true,
+      active: true,
+      variants: {
+        create: [
+          {
+            namePl: "Szablon – sam zakup",
+            nameEn: "Template – purchase only",
+            descriptionPl: "Pełny kod źródłowy szablonu, dożywotni dostęp, samodzielna instalacja.",
+            descriptionEn: "Full source code, lifetime access, self-installation.",
+            price: 79900,
+          },
+          {
+            namePl: "Szablon + instalacja i dostosowanie",
+            nameEn: "Template + installation & customization",
+            descriptionPl: "Pełny kod źródłowy + profesjonalna instalacja na Twoim serwerze, dostosowanie kolorów, logo i treści pod Twoją markę.",
+            descriptionEn: "Full source code + professional installation on your server, customization of colors, logo and content for your brand.",
+            price: 129900,
+          },
+        ],
+      },
+    },
+  });
+  console.log("Product created:", product7.namePl);
+
   console.log("Seed complete!");
 }
 

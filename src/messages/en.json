@@ -31,7 +31,7 @@
     "step1Title": "Choose a product",
     "step1Desc": "Browse our collection of templates, tools and scripts — find exactly what you need.",
     "step2Title": "Buy a license",
-    "step2Desc": "Pay securely via PayU — BLIK, card, or bank transfer.",
+    "step2Desc": "Pay securely via Stripe — BLIK, card, or Przelewy24.",
     "step3Title": "Download & launch",
     "step3Desc": "Get source files via email and deploy your product in minutes."
   },
@@ -64,7 +64,7 @@
     "emailHint": "We'll send the download link to this email.",
     "variant": "Selected variant",
     "total": "Total",
-    "pay": "Pay with PayU",
+    "pay": "Pay with Stripe",
     "processing": "Processing...",
     "terms": "By purchasing you agree to our",
     "termsLink": "terms of service",
@@ -206,7 +206,7 @@
     "q3": "How long can I download the files?",
     "a3": "The download link is valid for 7 days from purchase. You can download the files up to 5 times within this period.",
     "q4": "What payment methods are available?",
-    "a4": "We accept all popular payment methods via PayU: BLIK, payment cards (Visa, Mastercard), bank transfers.",
+    "a4": "We accept all popular payment methods via Stripe: BLIK, payment cards (Visa, Mastercard), Przelewy24.",
     "q5": "Can I get an invoice?",
     "a5": "Yes, contact us after purchase with your order number and we'll issue a VAT invoice."
   }

@@ -65,7 +65,7 @@ model Order {
   amount            Int         // amount in grosze
   currency          String      @default("PLN")
   status            OrderStatus @default(PENDING)
-  payuOrderId       String?     @unique
+  stripeSessionId   String?     @unique
   downloadToken     String      @unique
   invoiceCreated    Boolean     @default(false)
   wantInvoice       Boolean     @default(false)

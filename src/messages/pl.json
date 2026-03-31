@@ -31,7 +31,7 @@
     "step1Title": "Wybierz produkt",
     "step1Desc": "Przejrzyj naszą ofertę szablonów, narzędzi i skryptów — znajdź to, czego potrzebujesz.",
     "step2Title": "Kup licencję",
-    "step2Desc": "Zapłać bezpiecznie przez PayU — BLIK, karta lub przelew bankowy.",
+    "step2Desc": "Zapłać bezpiecznie przez Stripe — BLIK, karta lub Przelewy24.",
     "step3Title": "Pobierz i uruchom",
     "step3Desc": "Otrzymaj pliki źródłowe na email i uruchom produkt w kilka minut."
   },
@@ -64,7 +64,7 @@
     "emailHint": "Na ten adres wyślemy link do pobrania produktu.",
     "variant": "Wybrany wariant",
     "total": "Razem",
-    "pay": "Zapłać przez PayU",
+    "pay": "Zapłać przez Stripe",
     "processing": "Przetwarzanie...",
     "terms": "Kupując akceptujesz nasz",
     "termsLink": "regulamin",
@@ -206,7 +206,7 @@
     "q3": "Jak długo mogę pobierać pliki?",
     "a3": "Link do pobrania jest ważny przez 7 dni od zakupu. Możesz pobrać pliki maksymalnie 5 razy w tym okresie.",
     "q4": "Jakie metody płatności są dostępne?",
-    "a4": "Akceptujemy wszystkie popularne metody płatności przez PayU: BLIK, karty płatnicze (Visa, Mastercard), przelewy bankowe.",
+    "a4": "Akceptujemy wszystkie popularne metody płatności przez Stripe: BLIK, karty płatnicze (Visa, Mastercard), Przelewy24.",
     "q5": "Czy mogę dostać fakturę?",
     "a5": "Tak, skontaktuj się z nami po zakupie podając numer zamówienia, a wystawimy fakturę VAT."
   }

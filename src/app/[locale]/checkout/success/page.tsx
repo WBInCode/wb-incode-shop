@@ -1,7 +1,7 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { getPayUOrderStatus } from "@/lib/payu";
+import { getStripeSession } from "@/lib/stripe";
 import { createInvoice } from "@/lib/fakturownia";
 import { CheckCircle2, XCircle, Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -17,10 +17,6 @@ export default async function CheckoutSuccessPage({
   const t = await getTranslations("success");
   const locale = await getLocale();
   const token = sp?.token;
-  const errorCode = sp?.error;
-
-  // PayU sends error=000 for success — anything else means failure/cancellation
-  const payuReportedFailure = errorCode !== undefined && errorCode !== "000";
 
   let order = null;
   let isPaid = false;
@@ -36,10 +32,10 @@ export default async function CheckoutSuccessPage({
       if (order.status === "PAID") {
         isPaid = true;
       }
-      // If PENDING — check PayU for actual status (webhook may not have arrived yet)
-      else if (order.status === "PENDING" && order.payuOrderId && !payuReportedFailure) {
-        const payuStatus = await getPayUOrderStatus(order.payuOrderId);
-        if (payuStatus === "COMPLETED") {
+      // If PENDING — check Stripe for actual status (webhook may not have arrived yet)
+      else if (order.status === "PENDING" && order.stripeSessionId) {
+        const session = await getStripeSession(order.stripeSessionId);
+        if (session?.payment_status === "paid") {
           order = await prisma.order.update({
             where: { id: order.id },
             data: { status: "PAID" },
@@ -81,11 +77,7 @@ export default async function CheckoutSuccessPage({
               console.error("Failed to create Fakturownia invoice:", invoiceError);
             }
           }
-        } else if (
-          payuStatus === "CANCELED" ||
-          payuStatus === "REJECTED" ||
-          payuStatus === "WAITING_FOR_CONFIRMATION"
-        ) {
+        } else if (session?.status === "expired") {
           await prisma.order.update({
             where: { id: order.id },
             data: { status: "CANCELLED" },
@@ -95,8 +87,8 @@ export default async function CheckoutSuccessPage({
     }
   }
 
-  // If PayU flagged failure OR order is not paid — redirect to cancel page
-  if (payuReportedFailure || (order && !isPaid)) {
+  // If order is not paid — redirect to cancel page
+  if (order && !isPaid) {
     redirect(`/${locale}/checkout/cancel`);
   }
 
