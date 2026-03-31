@@ -65,7 +65,8 @@
     "processing": "Processing...",
     "terms": "By purchasing you agree to our",
     "termsLink": "terms of service",
-    "privacyLink": "privacy policy"
+    "privacyLink": "privacy policy",
+    "error": "An error occurred. Please try again."
   },
   "success": {
     "title": "Payment complete!",

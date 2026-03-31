@@ -79,6 +79,25 @@ export async function createPayUOrder(order: PayUOrderRequest): Promise<{ redire
   throw new Error(`PayU order creation failed: ${JSON.stringify(data)}`);
 }
 
+export async function getPayUOrderStatus(payuOrderId: string): Promise<string | null> {
+  try {
+    const accessToken = await getAccessToken();
+    const response = await fetch(`${PAYU_BASE_URL}/api/v2_1/orders/${payuOrderId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const order = data.orders?.[0];
+    return order?.status || null;
+  } catch {
+    return null;
+  }
+}
+
 export function verifyPayUSignature(body: string, signature: string): boolean {
   const parts = signature.split(";").reduce((acc: Record<string, string>, part) => {
     const [key, value] = part.split("=");

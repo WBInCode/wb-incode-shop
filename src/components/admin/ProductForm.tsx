@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Loader2, Save, Image, Video, X } from "lucide-react";
+import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
@@ -38,6 +38,13 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [newScreenshotUrl, setNewScreenshotUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
+  const [fileName, setFileName] = useState(
+    initialData?.fileUrl ? initialData.fileUrl.split("/").pop() || "" : ""
+  );
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<ProductFormData>(
     initialData || {
       slug: "",
@@ -64,6 +71,47 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   );
 
   const isEdit = !!initialData;
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.name.match(/\.(zip|rar)$/i)) {
+      setUploadProgress("Dozwolone tylko pliki ZIP i RAR");
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress("Przesyłanie...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        setData({ ...data, fileUrl: result.url });
+        setFileName(result.fileName);
+        setUploadProgress("");
+      } else {
+        setUploadProgress(result.error || "Błąd przesyłania");
+      }
+    } catch {
+      setUploadProgress("Błąd przesyłania pliku");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,13 +190,67 @@ export default function ProductForm({ initialData }: ProductFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Plik (ścieżka)</label>
-            <Input
-              value={data.fileUrl}
-              onChange={(e) => setData({ ...data, fileUrl: e.target.value })}
-              placeholder="templates/moj-szablon.zip"
-              required
-            />
+            <label className="block text-sm text-gray-400 mb-2">Plik produktu (ZIP/RAR)</label>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
+                dragOver
+                  ? "border-primary bg-primary/5"
+                  : data.fileUrl
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-white/10 hover:border-white/20 bg-white/[0.02]"
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".zip,.rar"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(file);
+                }}
+              />
+              {uploading ? (
+                <div className="flex items-center justify-center gap-2 py-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <span className="text-sm text-gray-400">{uploadProgress}</span>
+                </div>
+              ) : data.fileUrl ? (
+                <div className="flex items-center gap-3 py-1">
+                  <FileArchive className="w-8 h-8 text-primary flex-shrink-0" />
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="text-sm text-white font-medium truncate">{fileName}</p>
+                    <p className="text-xs text-gray-500 truncate">{data.fileUrl}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setData({ ...data, fileUrl: "" });
+                      setFileName("");
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-red-400 rounded-lg hover:bg-white/5 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="py-3">
+                  <Upload className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">
+                    Przeciągnij plik lub <span className="text-primary">kliknij, aby wybrać</span>
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">ZIP, RAR — maks. 500MB</p>
+                </div>
+              )}
+              {uploadProgress && !uploading && (
+                <p className="text-xs text-red-400 mt-2">{uploadProgress}</p>
+              )}
+            </div>
           </div>
 
           <div>
