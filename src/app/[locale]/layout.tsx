@@ -31,9 +31,11 @@ export default async function LocaleLayout({
       <SessionProvider>
         <GlobalBackground />
         <PageTransition />
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <div className="relative z-10 flex flex-col min-h-full">
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
         <CookieConsent />
       </SessionProvider>
     </NextIntlClientProvider>
