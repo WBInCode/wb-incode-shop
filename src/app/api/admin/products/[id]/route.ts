@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { auditLog, getClientIp } from "@/lib/audit";
 
 type Params = Promise<{ id: string }>;
 
@@ -58,6 +59,15 @@ export async function PUT(request: NextRequest, { params }: { params: Params }) 
       include: { variants: true },
     });
 
+    await auditLog({
+      action: "product.update",
+      entity: "product",
+      entityId: id,
+      actor: session.user?.email || "admin",
+      details: { slug, namePl, nameEn, categoryPl, variantsCount: variants?.length || 0 },
+      ipAddress: getClientIp(request),
+    });
+
     return NextResponse.json(product);
   } catch (error) {
     console.error("Update product error:", error);
@@ -83,6 +93,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Params }
       data: body,
     });
 
+    await auditLog({
+      action: "product.patch",
+      entity: "product",
+      entityId: id,
+      actor: session.user?.email || "admin",
+      details: body,
+      ipAddress: getClientIp(request),
+    });
+
     return NextResponse.json(product);
   } catch (error) {
     console.error("Patch product error:", error);
@@ -102,7 +121,17 @@ export async function DELETE(_request: NextRequest, { params }: { params: Params
   try {
     const { id } = await params;
 
+    const product = await prisma.product.findUnique({ where: { id }, select: { slug: true, namePl: true } });
     await prisma.product.delete({ where: { id } });
+
+    await auditLog({
+      action: "product.delete",
+      entity: "product",
+      entityId: id,
+      actor: session.user?.email || "admin",
+      details: { slug: product?.slug, namePl: product?.namePl },
+      ipAddress: getClientIp(_request),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

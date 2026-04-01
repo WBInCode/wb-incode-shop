@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { auditLog, getClientIp } from "@/lib/audit";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -80,6 +81,15 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
       await sendPasswordResetEmail(user.email, token);
 
+      await auditLog({
+        action: "user.reset-password",
+        entity: "user",
+        entityId: id,
+        actor: session.user?.email || "admin",
+        details: { userEmail: user.email },
+        ipAddress: getClientIp(req),
+      });
+
       return NextResponse.json({ success: true, message: "Link do resetowania hasła został wysłany" });
     }
 
@@ -88,6 +98,14 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         where: { id },
         data: { isActive: false },
       });
+      await auditLog({
+        action: "user.deactivate",
+        entity: "user",
+        entityId: id,
+        actor: session.user?.email || "admin",
+        details: { userEmail: user.email },
+        ipAddress: getClientIp(req),
+      });
       return NextResponse.json({ success: true, message: "Konto zostało dezaktywowane" });
     }
 
@@ -95,6 +113,14 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       await prisma.user.update({
         where: { id },
         data: { isActive: true },
+      });
+      await auditLog({
+        action: "user.activate",
+        entity: "user",
+        entityId: id,
+        actor: session.user?.email || "admin",
+        details: { userEmail: user.email },
+        ipAddress: getClientIp(req),
       });
       return NextResponse.json({ success: true, message: "Konto zostało aktywowane" });
     }
@@ -107,6 +133,14 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       });
       await prisma.passwordResetToken.deleteMany({ where: { email: user.email } });
       await prisma.user.delete({ where: { id } });
+      await auditLog({
+        action: "user.delete",
+        entity: "user",
+        entityId: id,
+        actor: session.user?.email || "admin",
+        details: { userEmail: user.email, userName: user.name },
+        ipAddress: getClientIp(req),
+      });
       return NextResponse.json({ success: true, message: "Konto zostało usunięte" });
     }
 

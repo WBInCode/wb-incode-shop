@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { verifyPayUSignature } from "@/lib/payu";
 import { sendDownloadEmail } from "@/lib/email";
 import { createInvoice } from "@/lib/fakturownia";
+import { auditLog } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,6 +39,15 @@ export async function POST(request: NextRequest) {
       await prisma.order.update({
         where: { id: order.id },
         data: { status: "PAID" },
+      });
+
+      await auditLog({
+        action: "order.paid",
+        entity: "order",
+        entityId: order.id,
+        actor: "payu",
+        actorType: "system",
+        details: { email: order.email, amount: order.amount, productId: order.productId },
       });
 
       // Send download email
@@ -88,6 +98,15 @@ export async function POST(request: NextRequest) {
       await prisma.order.update({
         where: { id: order.id },
         data: { status: "CANCELLED" },
+      });
+
+      await auditLog({
+        action: "order.cancelled",
+        entity: "order",
+        entityId: order.id,
+        actor: "payu",
+        actorType: "system",
+        details: { email: order.email, reason: "payu_canceled" },
       });
     }
 

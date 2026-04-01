@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   ShoppingBag,
+  ScrollText,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ const navigation = [
   { name: "Produkty", href: "/admin/products", icon: Package },
   { name: "Zamówienia", href: "/admin/orders", icon: ShoppingCart },
   { name: "Użytkownicy", href: "/admin/users", icon: Users },
+  { name: "Audit Log", href: "/admin/audit-logs", icon: ScrollText },
 ];
 
 export default function AdminSidebar({ user }: SidebarProps) {
