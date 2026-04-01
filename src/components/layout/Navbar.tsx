@@ -50,10 +50,7 @@ export default function Navbar() {
               height={32}
               className="object-contain"
             />
-            <span className="text-xl font-bold text-white">
-              WB <span className="text-primary">InCode</span>
-              <span className="text-gray-500 text-sm ml-1">Shop</span>
-            </span>
+            <span className="text-xl font-bold text-gray-500">Shop</span>
           </Link>
 
           {/* Desktop Nav */}
