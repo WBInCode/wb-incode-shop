@@ -27,6 +27,7 @@ export default function PrivacyPolicyPage() {
             <li>obsługa reklamacji i zapytań (podstawa: art. 6 ust. 1 lit. b i f RODO),</li>
             <li>prowadzenie konta klienta (podstawa: art. 6 ust. 1 lit. b RODO),</li>
             <li>analityka i poprawa działania Sklepu (podstawa: art. 6 ust. 1 lit. f RODO &ndash; prawnie uzasadniony interes Administratora),</li>
+            <li>zapewnienie bezpieczeństwa usług oraz wykrywanie nadużyć poprzez rejestrowanie adres&oacute;w IP użytkownik&oacute;w w logach audytowych (podstawa: art. 6 ust. 1 lit. f RODO &ndash; prawnie uzasadniony interes Administratora polegający na zapewnieniu bezpieczeństwa systemu informatycznego),</li>
             <li>dochodzenie lub obrona przed roszczeniami (podstawa: art. 6 ust. 1 lit. f RODO).</li>
           </ul>
 
@@ -36,7 +37,8 @@ export default function PrivacyPolicyPage() {
             <li>dane związane z zam&oacute;wieniem &ndash; przez okres wymagany przepisami prawa podatkowego (5 lat od końca roku podatkowego),</li>
             <li>dane związane z kontem klienta &ndash; do czasu usunięcia konta,</li>
             <li>dane przetwarzane na podstawie zgody &ndash; do czasu cofnięcia zgody,</li>
-            <li>dane przetwarzane na podstawie prawnie uzasadnionego interesu &ndash; do czasu wniesienia skutecznego sprzeciwu.</li>
+            <li>dane przetwarzane na podstawie prawnie uzasadnionego interesu &ndash; do czasu wniesienia skutecznego sprzeciwu,</li>
+            <li>adresy IP zapisane w logach audytowych &ndash; przez okres 12 miesięcy od daty zdarzenia, chyba że dłuższe przechowywanie jest niezbędne do ustalenia, dochodzenia lub obrony przed roszczeniami.</li>
           </ul>
 
           <h2 className="text-xl font-semibold text-white">5. Odbiorcy danych</h2>
