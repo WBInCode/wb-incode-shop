@@ -34,7 +34,7 @@ export default async function EditProductPage({ params }: { params: Params }) {
       nameEn: v.nameEn,
       descriptionPl: v.descriptionPl,
       descriptionEn: v.descriptionEn,
-      price: v.price,
+      price: v.price / 100,
     })),
   };
 

@@ -74,7 +74,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           nameEn: "Personal License",
           descriptionPl: "Użytek w jednym projekcie osobistym",
           descriptionEn: "Use in one personal project",
-          price: 9900,
+          price: 99,
         },
       ],
     }
@@ -223,6 +223,10 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           technologies: data.technologies.split(",").map((t) => t.trim()).filter(Boolean),
           screenshots: data.screenshots,
           videoUrl: data.videoUrl || null,
+          variants: data.variants.map((v) => ({
+            ...v,
+            price: Math.round(v.price * 100),
+          })),
         }),
       });
 
@@ -696,17 +700,18 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">
-                    Cena (grosze, np. 9900 = 99 zł)
+                    Cena (PLN)
                   </label>
                   <Input
                     type="number"
                     value={variant.price}
                     onChange={(e) =>
-                      updateVariant(i, "price", parseInt(e.target.value) || 0)
+                      updateVariant(i, "price", parseFloat(e.target.value) || 0)
                     }
-                    placeholder="9900"
+                    placeholder="99.00"
                     required
                     min={0}
+                    step="0.01"
                   />
                 </div>
               </div>
