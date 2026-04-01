@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { createStripeCheckoutSession } from "@/lib/stripe";
 import { generateDownloadToken } from "@/lib/download";
 import { auth } from "@/lib/auth";
+import { auditLog, getClientIp } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,6 +79,16 @@ export async function POST(request: NextRequest) {
     await prisma.order.update({
       where: { id: order.id },
       data: { stripeSessionId: stripeSession.sessionId },
+    });
+
+    await auditLog({
+      action: "order.create",
+      entity: "order",
+      entityId: order.id,
+      actor: email,
+      actorType: "customer",
+      details: { productSlug, variantId, amount: variant.price },
+      ipAddress: getClientIp(request),
     });
 
     return NextResponse.json({ redirectUrl: stripeSession.url });

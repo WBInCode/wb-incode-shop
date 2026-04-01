@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { constructStripeEvent } from "@/lib/stripe";
 import { sendDownloadEmail } from "@/lib/email";
 import { createInvoice } from "@/lib/fakturownia";
+import { auditLog } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,6 +42,15 @@ export async function POST(request: NextRequest) {
         await prisma.order.update({
           where: { id: order.id },
           data: { status: "PAID" },
+        });
+
+        await auditLog({
+          action: "order.paid",
+          entity: "order",
+          entityId: order.id,
+          actor: "stripe",
+          actorType: "system",
+          details: { email: order.email, amount: order.amount, productId: order.productId, stripeSessionId: session.id },
         });
 
         // Send download email
@@ -96,6 +106,15 @@ export async function POST(request: NextRequest) {
         await prisma.order.update({
           where: { id: orderId },
           data: { status: "CANCELLED" },
+        });
+
+        await auditLog({
+          action: "order.cancelled",
+          entity: "order",
+          entityId: orderId,
+          actor: "stripe",
+          actorType: "system",
+          details: { reason: "checkout.session.expired" },
         });
       }
     }

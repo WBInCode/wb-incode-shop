@@ -109,3 +109,19 @@ model PasswordResetToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // e.g. "product.create", "order.paid", "user.delete"
+  entity      String   // e.g. "product", "order", "user"
+  entityId    String?  // ID of the affected record
+  actor       String   // email or "system" for webhooks
+  actorType   String   @default("admin") // "admin", "system", "customer"
+  details     String   @default("{}") // JSON with changed fields / extra info
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actor])
+  @@index([createdAt])
+}

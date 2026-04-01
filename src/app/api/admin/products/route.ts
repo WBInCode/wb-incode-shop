@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { parseProductArrays } from "@/lib/utils";
+import { auditLog, getClientIp } from "@/lib/audit";
 
 export async function GET() {
   const session = await auth();
@@ -66,6 +67,15 @@ export async function POST(request: NextRequest) {
         },
       },
       include: { variants: true },
+    });
+
+    await auditLog({
+      action: "product.create",
+      entity: "product",
+      entityId: product.id,
+      actor: session.user?.email || "admin",
+      details: { slug, namePl, nameEn, categoryPl, variantsCount: variants?.length || 0 },
+      ipAddress: getClientIp(request),
     });
 
     return NextResponse.json(product, { status: 201 });
