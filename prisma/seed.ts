@@ -314,6 +314,50 @@ async function main() {
   });
   console.log("Product created:", product7.namePl);
 
+  const product8 = await prisma.product.upsert({
+    where: { slug: "learnly-lms" },
+    update: {},
+    create: {
+      slug: "learnly-lms",
+      namePl: "Learnly LMS – Platforma E-learningowa",
+      nameEn: "Learnly LMS – E-learning Platform",
+      descriptionPl:
+        "Kompletna platforma e-learningowa zbudowana w React 18 + Vite 5 z backendem Express REST API. Gotowe rozwiązanie do uruchomienia własnych kursów online.\n\n• Katalog kursów – przeglądanie, filtrowanie i zakup kursów\n• Moje kursy – śledzenie postępów z wizualnymi wskaźnikami\n• Lekcje wideo – interaktywny odtwarzacz z śledzeniem ukończenia\n• Quizy – sprawdzanie wiedzy z natychmiastowym wynikiem\n• Analityka – osobiste statystyki nauki i wykresy (Recharts)\n• Oceny – przegląd wyników testów\n• Powiadomienia – alerty z persistentnym stanem przeczytane/nieprzeczytane\n• Kalendarz – planowanie nauki\n• Forum społecznościowe – dyskusje z kategoriami\n• Panel administracyjny – zarządzanie kursami, użytkownikami i ustawieniami\n• Ustawienia – profil, motyw ciemny/jasny, język PL/EN (540+ kluczy i18n)\n• PWA – service worker dla trybu offline\n• SEO – dynamiczne meta tagi z react-helmet-async, robots.txt, sitemap.xml\n• Glassmorphism UI – nowoczesny design z CSS variables\n• Testy – 100+ testów (Vitest + React Testing Library)\n\nTech stack: React 18, Vite 5, React Router 6, Express 4, JWT auth, Recharts, Lucide React, CSS3.",
+      descriptionEn:
+        "A complete e-learning platform built with React 18 + Vite 5 and an Express REST API backend. A ready-made solution for launching your own online courses.\n\n• Course Catalog – browse, filter, and purchase courses\n• My Courses – track learning progress with visual indicators\n• Video Lessons – interactive player with completion tracking\n• Quizzes – knowledge checks with instant scoring\n• Analytics – personal learning statistics and charts (Recharts)\n• Grades – test results overview\n• Notifications – real-time alerts with persistent read/unread state\n• Calendar – plan your study schedule\n• Community Forum – discussion threads with categories\n• Admin Panel – manage courses, users, and platform settings\n• Settings – profile, dark/light theme, language PL/EN (540+ i18n keys)\n• PWA – service worker for offline readiness\n• SEO – dynamic meta tags with react-helmet-async, robots.txt, sitemap.xml\n• Glassmorphism UI – modern design with CSS variables\n• Tests – 100+ tests (Vitest + React Testing Library)\n\nTech stack: React 18, Vite 5, React Router 6, Express 4, JWT auth, Recharts, Lucide React, CSS3.",
+      categoryPl: "Szablon Strony",
+      categoryEn: "Website Template",
+      technologies: JSON.stringify(["React", "Vite", "Express", "JWT", "Recharts", "CSS3", "PWA"]),
+      screenshots: JSON.stringify([
+        "https://placehold.co/800x500/0a0a0a/30e87a?text=Learnly+LMS+Dashboard",
+        "https://placehold.co/800x500/121212/30e87a?text=Course+Catalog",
+        "https://placehold.co/800x500/0a0a0a/30e87a?text=Video+Lesson",
+      ]),
+      fileUrl: "products/learnly-lms.zip",
+      featured: true,
+      active: true,
+      variants: {
+        create: [
+          {
+            namePl: "Szablon – sam zakup",
+            nameEn: "Template – purchase only",
+            descriptionPl: "Pełny kod źródłowy (frontend + backend), dożywotni dostęp, samodzielna instalacja.",
+            descriptionEn: "Full source code (frontend + backend), lifetime access, self-installation.",
+            price: 59900,
+          },
+          {
+            namePl: "Szablon + instalacja i dostosowanie",
+            nameEn: "Template + installation & customization",
+            descriptionPl: "Pełny kod źródłowy + profesjonalna instalacja na Twoim serwerze, dostosowanie kolorów, logo i treści pod Twoją markę.",
+            descriptionEn: "Full source code + professional installation on your server, customization of colors, logo and content for your brand.",
+            price: 99900,
+          },
+        ],
+      },
+    },
+  });
+  console.log("Product created:", product8.namePl);
+
   console.log("Seed complete!");
 }
 
