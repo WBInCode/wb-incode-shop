@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive } from "lucide-react";
+import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive, GripVertical, Link as LinkIcon, ImagePlus } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
@@ -45,6 +45,16 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   );
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Image upload state
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadQueue, setImageUploadQueue] = useState<File[]>([]);
+  const [imageUploadProgress, setImageUploadProgress] = useState("");
+  const [imageDragOver, setImageDragOver] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  // Image reorder state
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
+  const [dragOverImageIndex, setDragOverImageIndex] = useState<number | null>(null);
+  const isProcessingQueue = useRef(false);
   const [data, setData] = useState<ProductFormData>(
     initialData || {
       slug: "",
@@ -111,6 +121,89 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     setDragOver(false);
     const file = e.dataTransfer.files[0];
     if (file) handleFileUpload(file);
+  };
+
+  // Upload a single image file to the server
+  const uploadSingleImage = useCallback(async (file: File): Promise<string | null> => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+    if (!allowedTypes.includes(file.type)) {
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/admin/upload-image", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    return result.url;
+  }, []);
+
+  // Process image upload queue sequentially
+  const processImageQueue = useCallback(async (files: File[]) => {
+    if (isProcessingQueue.current || files.length === 0) return;
+    isProcessingQueue.current = true;
+    setImageUploading(true);
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setImageUploadProgress(`Przesyłanie ${i + 1} z ${files.length}: ${file.name}`);
+
+      const url = await uploadSingleImage(file);
+      if (url) {
+        setData(prev => ({ ...prev, screenshots: [...prev.screenshots, url] }));
+      }
+    }
+
+    setImageUploading(false);
+    setImageUploadProgress("");
+    setImageUploadQueue([]);
+    isProcessingQueue.current = false;
+  }, [uploadSingleImage]);
+
+  // Handle image files dropped or selected
+  const handleImageFiles = useCallback((files: FileList) => {
+    const imageFiles = Array.from(files).filter(f =>
+      ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"].includes(f.type)
+    );
+    if (imageFiles.length === 0) return;
+    setImageUploadQueue(imageFiles);
+    processImageQueue(imageFiles);
+  }, [processImageQueue]);
+
+  // Image drag & drop handlers
+  const handleImageDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setImageDragOver(false);
+    if (e.dataTransfer.files.length > 0) {
+      handleImageFiles(e.dataTransfer.files);
+    }
+  };
+
+  // Screenshot reorder via drag
+  const handleScreenshotDragStart = (index: number) => {
+    setDraggedImageIndex(index);
+  };
+
+  const handleScreenshotDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverImageIndex(index);
+  };
+
+  const handleScreenshotDragEnd = () => {
+    if (draggedImageIndex !== null && dragOverImageIndex !== null && draggedImageIndex !== dragOverImageIndex) {
+      const newScreenshots = [...data.screenshots];
+      const [dragged] = newScreenshots.splice(draggedImageIndex, 1);
+      newScreenshots.splice(dragOverImageIndex, 0, dragged);
+      setData({ ...data, screenshots: newScreenshots });
+    }
+    setDraggedImageIndex(null);
+    setDragOverImageIndex(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -349,16 +442,35 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         {/* Screenshots */}
         <div className="mb-6">
           <label className="block text-sm text-gray-400 mb-3">
-            Zrzuty ekranu (URL)
+            Zrzuty ekranu
           </label>
 
+          {/* Image grid with reorder */}
           {data.screenshots.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
               {data.screenshots.map((url, i) => (
                 <div
-                  key={i}
-                  className="relative group rounded-xl overflow-hidden border border-white/10 bg-white/5"
+                  key={`${url}-${i}`}
+                  draggable
+                  onDragStart={() => handleScreenshotDragStart(i)}
+                  onDragOver={(e) => handleScreenshotDragOver(e, i)}
+                  onDragEnd={handleScreenshotDragEnd}
+                  className={`relative group rounded-xl overflow-hidden border bg-white/5 cursor-grab active:cursor-grabbing transition-all ${
+                    draggedImageIndex === i
+                      ? "opacity-40 scale-95 border-primary/50"
+                      : dragOverImageIndex === i
+                      ? "border-primary border-2 scale-[1.02]"
+                      : "border-white/10"
+                  }`}
                 >
+                  {/* Drag handle */}
+                  <div className="absolute top-2 left-2 p-1 bg-black/60 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <GripVertical className="w-3.5 h-3.5" />
+                  </div>
+                  {/* Order badge */}
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-black/60 rounded-full text-[10px] text-gray-300 font-medium opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    #{i + 1}
+                  </div>
                   <img
                     src={url}
                     alt={`Screenshot ${i + 1}`}
@@ -376,7 +488,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                         screenshots: data.screenshots.filter((_, idx) => idx !== i),
                       })
                     }
-                    className="absolute top-2 right-2 p-1 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    className="absolute top-2 right-2 p-1 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -388,6 +500,61 @@ export default function ProductForm({ initialData }: ProductFormProps) {
             </div>
           )}
 
+          {data.screenshots.length > 1 && (
+            <p className="text-xs text-gray-600 mb-4">
+              Przeciągnij zdjęcia, aby zmienić kolejność wyświetlania.
+            </p>
+          )}
+
+          {/* Image upload drop zone */}
+          <div
+            onDragOver={(e) => { e.preventDefault(); setImageDragOver(true); }}
+            onDragLeave={() => setImageDragOver(false)}
+            onDrop={handleImageDrop}
+            onClick={() => imageInputRef.current?.click()}
+            className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all mb-4 ${
+              imageDragOver
+                ? "border-primary bg-primary/5"
+                : "border-white/10 hover:border-white/20 bg-white/[0.02]"
+            }`}
+          >
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  handleImageFiles(e.target.files);
+                  e.target.value = "";
+                }
+              }}
+            />
+            {imageUploading ? (
+              <div className="flex flex-col items-center gap-2 py-2">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <span className="text-sm text-gray-400">{imageUploadProgress}</span>
+              </div>
+            ) : (
+              <div className="py-2">
+                <ImagePlus className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+                <p className="text-sm text-gray-400">
+                  Przeciągnij zdjęcia lub{" "}
+                  <span className="text-primary">kliknij, aby wybrać</span>
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  JPEG, PNG, WebP, GIF, AVIF — maks. 10MB / zdjęcie — można wrzucić kilka na raz
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* URL input for screenshots */}
+          <div className="flex items-center gap-2 mb-2">
+            <LinkIcon className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+            <span className="text-xs text-gray-500">lub dodaj z URL:</span>
+          </div>
           <div className="flex gap-2">
             <Input
               value={newScreenshotUrl}
