@@ -55,7 +55,13 @@
     "video": "Video preview",
     "variants": "Choose a license",
     "buyNow": "Buy now",
-    "back": "Back to products"
+    "back": "Back to products",
+    "livePreview": "Live Preview"
+  },
+  "preview": {
+    "back": "Back",
+    "buy": "Buy template",
+    "loading": "Loading preview..."
   },
   "checkout": {
     "title": "Checkout",

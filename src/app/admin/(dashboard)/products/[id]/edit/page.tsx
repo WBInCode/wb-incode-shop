@@ -27,6 +27,7 @@ export default async function EditProductPage({ params }: { params: Params }) {
     technologies: parseJsonArray(product.technologies).join(", "),
     screenshots: parseJsonArray(product.screenshots),
     videoUrl: product.videoUrl || "",
+    previewUrl: product.previewUrl || "",
     fileUrl: product.fileUrl,
     variants: product.variants.map((v) => ({
       id: v.id,
