@@ -9,6 +9,7 @@ import Link from "next/link";
 import Badge from "@/components/ui/Badge";
 import PricingVariants from "@/components/shop/PricingVariants";
 import CheckoutForm from "@/components/shop/CheckoutForm";
+import AddonsSelector, { Addon } from "@/components/shop/AddonsSelector";
 
 interface Variant {
   id: string;
@@ -32,6 +33,7 @@ interface Product {
   screenshots: string[];
   videoUrl?: string | null;
   variants: Variant[];
+  addons: Addon[];
 }
 
 function getVideoEmbedUrl(url: string): string | null {
@@ -54,6 +56,9 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [activeScreenshot, setActiveScreenshot] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>(
+    product.addons.filter((a) => a.required).map((a) => a.id)
+  );
 
   const name = locale === "pl" ? product.namePl : product.nameEn;
   const description = locale === "pl" ? product.descriptionPl : product.descriptionEn;
@@ -242,6 +247,21 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
               />
             </motion.div>
 
+            {/* Addons */}
+            {product.addons.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.45, ease: "easeOut" }}
+              >
+                <AddonsSelector
+                  addons={product.addons}
+                  selectedIds={selectedAddonIds}
+                  onChange={setSelectedAddonIds}
+                />
+              </motion.div>
+            )}
+
             {/* Checkout form */}
             {selectedVariant && (
               <motion.div
@@ -258,6 +278,9 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
                       : selectedVariant.nameEn
                   }
                   price={selectedVariant.price}
+                  selectedAddons={product.addons.filter((a) =>
+                    selectedAddonIds.includes(a.id)
+                  )}
                 />
               </motion.div>
             )}

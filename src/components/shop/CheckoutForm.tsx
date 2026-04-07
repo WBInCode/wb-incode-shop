@@ -7,12 +7,14 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { formatPrice, formatPriceEn } from "@/lib/utils";
 import Link from "next/link";
+import type { Addon } from "@/components/shop/AddonsSelector";
 
 interface CheckoutFormProps {
   productSlug: string;
   variantId: string;
   variantName: string;
   price: number;
+  selectedAddons?: Addon[];
 }
 
 export default function CheckoutForm({
@@ -20,9 +22,12 @@ export default function CheckoutForm({
   variantId,
   variantName,
   price,
+  selectedAddons = [],
 }: CheckoutFormProps) {
   const t = useTranslations("checkout");
   const locale = useLocale();
+  const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
+  const totalPrice = price + addonsTotal;
   const [email, setEmail] = useState("");
   const [wantInvoice, setWantInvoice] = useState(false);
   const [isCompany, setIsCompany] = useState(true);
@@ -49,6 +54,7 @@ export default function CheckoutForm({
           productSlug,
           variantId,
           locale,
+          addonIds: selectedAddons.map((a) => a.id),
           wantInvoice,
           ...(wantInvoice && isCompany && { companyName, companyNip, companyAddress }),
           ...(wantInvoice && !isCompany && { personName, personAddress }),
@@ -80,10 +86,20 @@ export default function CheckoutForm({
             <span className="text-gray-400 text-sm">{t("variant")}</span>
             <span className="text-white font-medium">{variantName}</span>
           </div>
-          <div className="flex justify-between items-center">
+          {selectedAddons.map((addon) => (
+            <div key={addon.id} className="flex justify-between items-center mb-2">
+              <span className="text-gray-500 text-xs truncate max-w-[60%]">
+                {locale === "pl" ? addon.namePl : addon.nameEn}
+              </span>
+              <span className="text-gray-400 text-xs font-medium">
+                +{locale === "pl" ? formatPrice(addon.price) : formatPriceEn(addon.price)}
+              </span>
+            </div>
+          ))}
+          <div className="flex justify-between items-center border-t border-white/10 pt-2 mt-2">
             <span className="text-gray-400 text-sm">{t("total")}</span>
             <span className="text-primary font-bold text-xl">
-              {locale === "pl" ? formatPrice(price) : formatPriceEn(price)}
+              {locale === "pl" ? formatPrice(totalPrice) : formatPriceEn(totalPrice)}
             </span>
           </div>
         </div>

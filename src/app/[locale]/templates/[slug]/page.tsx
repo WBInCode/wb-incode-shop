@@ -14,7 +14,10 @@ export default async function TemplateDetailPage({ params }: { params: Params })
 
   const rawProduct = await prisma.product.findFirst({
     where: { slug, active: true },
-    include: { variants: { where: { active: true } } },
+    include: {
+      variants: { where: { active: true } },
+      addons: { where: { active: true }, orderBy: { sortOrder: "asc" } },
+    },
   });
 
   if (!rawProduct) return notFound();

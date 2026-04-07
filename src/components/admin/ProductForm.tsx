@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive, GripVertical, Link as LinkIcon, ImagePlus } from "lucide-react";
+import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive, GripVertical, Link as LinkIcon, ImagePlus, Tag } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
@@ -13,6 +13,22 @@ interface Variant {
   descriptionPl: string;
   descriptionEn: string;
   price: number;
+}
+
+interface AddonItem {
+  id?: string;
+  namePl: string;
+  nameEn: string;
+  descriptionPl: string;
+  descriptionEn: string;
+  price: number;
+  originalPrice: number;
+  required: boolean;
+  badgePl: string;
+  badgeEn: string;
+  active: boolean;
+  sortOrder: number;
+  _saving?: boolean;
 }
 
 interface ProductFormData {
@@ -81,6 +97,117 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   );
 
   const isEdit = !!initialData;
+
+  // Addons state (edit mode only)
+  const [addons, setAddons] = useState<AddonItem[]>([]);
+  const [addonsLoaded, setAddonsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!isEdit) return;
+    fetch(`/api/admin/products/${initialData.id}/addons`)
+      .then((r) => r.json())
+      .then((data) => {
+        setAddons(
+          data.map((a: AddonItem & { price: number; originalPrice: number | null }) => ({
+            id: a.id,
+            namePl: a.namePl,
+            nameEn: a.nameEn,
+            descriptionPl: a.descriptionPl || "",
+            descriptionEn: a.descriptionEn || "",
+            price: a.price / 100,
+            originalPrice: a.originalPrice ? a.originalPrice / 100 : 0,
+            required: a.required,
+            badgePl: a.badgePl || "",
+            badgeEn: a.badgeEn || "",
+            active: a.active,
+            sortOrder: a.sortOrder,
+          }))
+        );
+        setAddonsLoaded(true);
+      })
+      .catch(() => setAddonsLoaded(true));
+  }, [isEdit, initialData?.id]);
+
+  const addAddonRow = () => {
+    setAddons([
+      ...addons,
+      {
+        namePl: "",
+        nameEn: "",
+        descriptionPl: "",
+        descriptionEn: "",
+        price: 0,
+        originalPrice: 0,
+        required: false,
+        badgePl: "",
+        badgeEn: "",
+        active: true,
+        sortOrder: addons.length,
+      },
+    ]);
+  };
+
+  const updateAddonField = (index: number, field: keyof AddonItem, value: string | number | boolean) => {
+    const updated = [...addons];
+    updated[index] = { ...updated[index], [field]: value };
+    setAddons(updated);
+  };
+
+  const saveAddon = async (index: number) => {
+    const addon = addons[index];
+    const updated = [...addons];
+    updated[index] = { ...addon, _saving: true };
+    setAddons(updated);
+
+    const payload = {
+      namePl: addon.namePl,
+      nameEn: addon.nameEn,
+      descriptionPl: addon.descriptionPl || null,
+      descriptionEn: addon.descriptionEn || null,
+      price: Math.round(addon.price * 100),
+      originalPrice: addon.originalPrice ? Math.round(addon.originalPrice * 100) : null,
+      required: addon.required,
+      badgePl: addon.badgePl || null,
+      badgeEn: addon.badgeEn || null,
+      active: addon.active,
+      sortOrder: addon.sortOrder,
+    };
+
+    const res = addon.id
+      ? await fetch(`/api/admin/addons/${addon.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch(`/api/admin/products/${initialData!.id}/addons`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+    if (res.ok) {
+      const saved = await res.json();
+      const refreshed = [...addons];
+      refreshed[index] = {
+        ...addon,
+        id: saved.id,
+        _saving: false,
+      };
+      setAddons(refreshed);
+    } else {
+      const refreshed = [...addons];
+      refreshed[index] = { ...addon, _saving: false };
+      setAddons(refreshed);
+    }
+  };
+
+  const deleteAddon = async (index: number) => {
+    const addon = addons[index];
+    if (addon.id) {
+      await fetch(`/api/admin/addons/${addon.id}`, { method: "DELETE" });
+    }
+    setAddons(addons.filter((_, i) => i !== index));
+  };
 
   const handleFileUpload = async (file: File) => {
     if (!file.name.match(/\.(zip|rar)$/i)) {
@@ -719,6 +846,130 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           ))}
         </div>
       </div>
+
+      {/* Addons — only in edit mode */}
+      {isEdit && (
+        <div className="bg-surface border border-white/5 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Tag className="w-5 h-5 text-primary" />
+              Usługi dodatkowe (Addony)
+            </h3>
+            <button
+              type="button"
+              onClick={addAddonRow}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-full text-gray-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Dodaj addon
+            </button>
+          </div>
+
+          {!addonsLoaded ? (
+            <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Ładowanie...
+            </div>
+          ) : addons.length === 0 ? (
+            <p className="text-sm text-gray-600 py-2">
+              Brak addonów. Kliknij &quot;Dodaj addon&quot;, aby stworzyć pierwszy.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {addons.map((addon, i) => (
+                <div key={addon.id || `new-${i}`} className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-gray-400 font-medium">
+                      Addon #{i + 1} {!addon.id && <span className="text-yellow-500 text-xs">(niezapisany)</span>}
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => saveAddon(i)}
+                        disabled={addon._saving}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary/20 border border-primary/30 rounded-lg text-primary hover:bg-primary/30 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {addon._saving ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Save className="w-3.5 h-3.5" />
+                        )}
+                        Zapisz
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteAddon(i)}
+                        className="p-1.5 text-gray-400 hover:text-red-400 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Nazwa (PL)</label>
+                      <Input value={addon.namePl} onChange={(e) => updateAddonField(i, "namePl", e.target.value)} placeholder="Instalacja szablonu" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Nazwa (EN)</label>
+                      <Input value={addon.nameEn} onChange={(e) => updateAddonField(i, "nameEn", e.target.value)} placeholder="Template installation" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Opis (PL)</label>
+                      <Input value={addon.descriptionPl} onChange={(e) => updateAddonField(i, "descriptionPl", e.target.value)} placeholder="Krótki opis usługi" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Opis (EN)</label>
+                      <Input value={addon.descriptionEn} onChange={(e) => updateAddonField(i, "descriptionEn", e.target.value)} placeholder="Short service description" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Cena (PLN)</label>
+                      <Input type="number" min={0} step="0.01" value={addon.price} onChange={(e) => updateAddonField(i, "price", parseFloat(e.target.value) || 0)} placeholder="184.00" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Cena oryginalna (PLN) — przekreślona</label>
+                      <Input type="number" min={0} step="0.01" value={addon.originalPrice} onChange={(e) => updateAddonField(i, "originalPrice", parseFloat(e.target.value) || 0)} placeholder="222.00" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Badge (PL) — np. Usługa Dnia</label>
+                      <Input value={addon.badgePl} onChange={(e) => updateAddonField(i, "badgePl", e.target.value)} placeholder="Usługa Dnia" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Badge (EN)</label>
+                      <Input value={addon.badgeEn} onChange={(e) => updateAddonField(i, "badgeEn", e.target.value)} placeholder="Service of the Day" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Kolejność</label>
+                      <Input type="number" min={0} value={addon.sortOrder} onChange={(e) => updateAddonField(i, "sortOrder", parseInt(e.target.value) || 0)} placeholder="0" />
+                    </div>
+                    <div className="flex items-center gap-4 pt-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={addon.required}
+                          onChange={(e) => updateAddonField(i, "required", e.target.checked)}
+                          className="w-4 h-4 accent-primary"
+                        />
+                        <span className="text-xs text-gray-400">Wymagany (pre-selected)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={addon.active}
+                          onChange={(e) => updateAddonField(i, "active", e.target.checked)}
+                          className="w-4 h-4 accent-primary"
+                        />
+                        <span className="text-xs text-gray-400">Aktywny</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Submit */}
       <div className="flex gap-4">
