@@ -40,6 +40,7 @@ model Product {
 
   variants       Variant[]
   orders         Order[]
+  addons         Addon[]
 }
 
 model Variant {
@@ -81,6 +82,38 @@ model Order {
   product           Product     @relation(fields: [productId], references: [id])
   variant           Variant     @relation(fields: [variantId], references: [id])
   user              User?       @relation(fields: [userId], references: [id])
+  orderAddons       OrderAddon[]
+}
+
+model Addon {
+  id            String   @id @default(cuid())
+  productId     String
+  namePl        String
+  nameEn        String
+  descriptionPl String?
+  descriptionEn String?
+  price         Int      // price in grosze
+  originalPrice Int?     // original (crossed-out) price in grosze
+  currency      String   @default("PLN")
+  required      Boolean  @default(false)
+  badgePl       String?
+  badgeEn       String?
+  active        Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  product       Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderAddons   OrderAddon[]
+}
+
+model OrderAddon {
+  id      String @id @default(cuid())
+  orderId String
+  addonId String
+  price   Int    // price at time of order
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  addon   Addon  @relation(fields: [addonId], references: [id])
 }
 
 model Admin {

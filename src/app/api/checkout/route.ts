@@ -8,7 +8,7 @@ import { auditLog, getClientIp } from "@/lib/audit";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, productSlug, variantId, locale, wantInvoice, isCompany, companyName, companyNip, companyAddress, personName, personAddress } = body;
+    const { email, productSlug, variantId, locale, addonIds, wantInvoice, isCompany, companyName, companyNip, companyAddress, personName, personAddress } = body;
 
     if (!email || !productSlug || !variantId) {
       return NextResponse.json(
@@ -34,6 +34,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Variant not found" }, { status: 404 });
     }
 
+    // Validate and fetch addons
+    const safeAddonIds: string[] = Array.isArray(addonIds) ? addonIds : [];
+    const addons = safeAddonIds.length > 0
+      ? await prisma.addon.findMany({
+          where: { id: { in: safeAddonIds }, productId: product.id, active: true },
+        })
+      : [];
+    const addonsTotal = addons.reduce((sum, a) => sum + a.price, 0);
+    const totalAmount = variant.price + addonsTotal;
+
     // Create order
     const downloadToken = generateDownloadToken();
 
@@ -47,7 +57,7 @@ export async function POST(request: NextRequest) {
         email,
         productId: product.id,
         variantId: variant.id,
-        amount: variant.price,
+        amount: totalAmount,
         currency: variant.currency,
         downloadToken,
         ...(userId ? { userId } : {}),
@@ -58,6 +68,11 @@ export async function POST(request: NextRequest) {
         companyAddress: wantInvoice && isCompany ? companyAddress : null,
         personName: wantInvoice && !isCompany ? personName : null,
         personAddress: wantInvoice && !isCompany ? personAddress : null,
+        ...(addons.length > 0 ? {
+          orderAddons: {
+            create: addons.map((a) => ({ addonId: a.id, price: a.price })),
+          },
+        } : {}),
       },
     });
 
@@ -68,7 +83,7 @@ export async function POST(request: NextRequest) {
     const stripeSession = await createStripeCheckoutSession({
       orderId: order.id,
       productName: locale === "pl" ? product.namePl : product.nameEn,
-      amount: variant.price,
+      amount: totalAmount,
       currency: variant.currency,
       buyerEmail: email,
       successUrl: `${appUrl}/${currentLocale}/checkout/success?token=${downloadToken}`,
@@ -87,7 +102,7 @@ export async function POST(request: NextRequest) {
       entityId: order.id,
       actor: email,
       actorType: "customer",
-      details: { productSlug, variantId, amount: variant.price },
+      details: { productSlug, variantId, amount: totalAmount, addonIds: addons.map((a) => a.id) },
       ipAddress: getClientIp(request),
     });
 
