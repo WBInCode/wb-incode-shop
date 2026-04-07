@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   const modelMessages = await convertToModelMessages(recentMessages);
 
   const result = streamText({
-    model: google("gemini-2.0-flash"),
+    model: google("gemini-2.5-flash-lite"),
     system:
       SYSTEM_PROMPT +
       (locale === "en"
