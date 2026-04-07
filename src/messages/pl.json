@@ -217,5 +217,15 @@
     "a4": "Akceptujemy wszystkie popularne metody płatności przez Stripe: BLIK, karty płatnicze (Visa, Mastercard), Przelewy24.",
     "q5": "Czy mogę dostać fakturę?",
     "a5": "Tak, skontaktuj się z nami po zakupie podając numer zamówienia, a wystawimy fakturę VAT."
+  },
+  "chat": {
+    "title": "Asystent AI",
+    "subtitle": "Odpowiem na Twoje pytania",
+    "welcome": "Cześć! 👋 Jestem asystentem WB InCode Shop. Mogę pomóc Ci z pytaniami o nasze produkty, licencje, płatności i nie tylko. W czym mogę pomóc?",
+    "placeholder": "Zadaj pytanie...",
+    "open": "Otwórz czat z asystentem AI",
+    "close": "Zamknij czat",
+    "send": "Wyślij",
+    "error": "Wystąpił błąd. Spróbuj ponownie."
   }
 }

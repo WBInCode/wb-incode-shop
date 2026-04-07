@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CookieConsent from "@/components/layout/CookieConsent";
+import AiChatBubble from "@/components/ui/AiChatBubble";
 import GlobalBackground from "@/components/ui/GlobalBackground";
 import PageTransition from "@/components/ui/PageTransition";
 
@@ -37,6 +38,7 @@ export default async function LocaleLayout({
           <Footer />
         </div>
         <CookieConsent />
+        <AiChatBubble />
       </SessionProvider>
     </NextIntlClientProvider>
   );
