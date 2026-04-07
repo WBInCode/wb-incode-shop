@@ -170,3 +170,76 @@ export async function sendWelcomeEmail(
     `,
   });
 }
+
+export async function sendInvoiceRequestToAdmin(data: {
+  orderId: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerTaxNo?: string;
+  buyerAddress?: string;
+  isCompany?: boolean;
+  productName: string;
+  totalPriceGross: number;
+  kind: "vat" | "receipt";
+}): Promise<void> {
+  const safeOrderId = escapeHtml(data.orderId);
+  const safeBuyerName = escapeHtml(data.buyerName);
+  const safeBuyerEmail = escapeHtml(data.buyerEmail);
+  const safeTaxNo = data.buyerTaxNo ? escapeHtml(data.buyerTaxNo) : "—";
+  const safeAddress = data.buyerAddress ? escapeHtml(data.buyerAddress) : "—";
+  const safeProductName = escapeHtml(data.productName);
+  const kindLabel = data.kind === "vat" ? "Faktura VAT" : "Paragon";
+  const buyerType = data.isCompany ? "Firma" : "Osoba fizyczna";
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || "noreply@wb-incode.pl",
+    to: "technical-support@wb-partners.pl",
+    subject: `[Faktura] Nowe zamówienie ${safeOrderId} — do wystawienia`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #ededed; padding: 40px; border-radius: 16px;">
+        <h1 style="color: #30e87a; font-size: 24px; margin-bottom: 8px;">Nowe zamówienie — wymagana faktura</h1>
+        <p style="color: #999; margin-bottom: 24px;">Wpłynęło nowe opłacone zamówienie. Proszę wystawić dokument ręcznie w Fakturowni.</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top; width: 140px;">ID zamówienia:</td>
+            <td style="color: #ededed; padding: 8px 0;">${safeOrderId}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Typ dokumentu:</td>
+            <td style="color: #ededed; padding: 8px 0;">${kindLabel}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Typ nabywcy:</td>
+            <td style="color: #ededed; padding: 8px 0;">${buyerType}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Nabywca:</td>
+            <td style="color: #ededed; padding: 8px 0;">${safeBuyerName}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Email:</td>
+            <td style="color: #ededed; padding: 8px 0;"><a href="mailto:${safeBuyerEmail}" style="color: #30e87a;">${safeBuyerEmail}</a></td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">NIP:</td>
+            <td style="color: #ededed; padding: 8px 0;">${safeTaxNo}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Adres:</td>
+            <td style="color: #ededed; padding: 8px 0;">${safeAddress}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Produkt:</td>
+            <td style="color: #ededed; padding: 8px 0;">${safeProductName}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; padding: 8px 0; vertical-align: top;">Kwota brutto:</td>
+            <td style="color: #ededed; padding: 8px 0; font-weight: bold;">${data.totalPriceGross.toFixed(2)} PLN</td>
+          </tr>
+        </table>
+        <hr style="border: none; border-top: 1px solid #222; margin: 32px 0;" />
+        <p style="color: #444; font-size: 12px;">WB InCode Shop — automatyczne powiadomienie</p>
+      </div>
+    `,
+  });
+}

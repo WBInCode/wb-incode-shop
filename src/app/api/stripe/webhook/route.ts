@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { constructStripeEvent } from "@/lib/stripe";
-import { sendDownloadEmail } from "@/lib/email";
-import { createInvoice } from "@/lib/fakturownia";
+import { sendDownloadEmail, sendInvoiceRequestToAdmin } from "@/lib/email";
 import { auditLog } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
@@ -63,12 +62,13 @@ export async function POST(request: NextRequest) {
           console.error("Failed to send download email:", emailError);
         }
 
-        // Create invoice in Fakturownia (only if not already created)
+        // Notify admin to create invoice manually
         if (!order.invoiceCreated) {
           try {
             const isCompanyInvoice = order.wantInvoice && order.isCompany;
             const isPersonInvoice = order.wantInvoice && !order.isCompany;
-            await createInvoice({
+            await sendInvoiceRequestToAdmin({
+              orderId: order.id,
               buyerName: isCompanyInvoice && order.companyName
                 ? order.companyName
                 : isPersonInvoice && order.personName
@@ -83,10 +83,7 @@ export async function POST(request: NextRequest) {
                   : undefined,
               isCompany: order.wantInvoice ? order.isCompany : undefined,
               productName: order.product.namePl,
-              quantity: 1,
               totalPriceGross: order.amount / 100,
-              tax: 23,
-              orderId: order.id,
               kind: order.wantInvoice ? "vat" : "receipt",
             });
             await prisma.order.update({
@@ -94,7 +91,7 @@ export async function POST(request: NextRequest) {
               data: { invoiceCreated: true },
             });
           } catch (invoiceError) {
-            console.error("Failed to create Fakturownia invoice:", invoiceError);
+            console.error("Failed to send invoice notification to admin:", invoiceError);
           }
         }
       }
