@@ -25,9 +25,12 @@ export default async function PreviewPage({ params }: { params: Params }) {
 
   const name = locale === "pl" ? product.namePl : product.nameEn;
 
+  // Use proxy route to serve HTML with correct headers (Blob serves with Content-Disposition: attachment)
+  const proxyUrl = `/api/preview/${product.slug}`;
+
   return (
     <TemplatePreview
-      previewUrl={product.previewUrl}
+      previewUrl={proxyUrl}
       productName={name}
       productSlug={product.slug}
     />
