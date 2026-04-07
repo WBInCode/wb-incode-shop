@@ -217,5 +217,15 @@
     "a4": "We accept all popular payment methods via Stripe: BLIK, payment cards (Visa, Mastercard), Przelewy24.",
     "q5": "Can I get an invoice?",
     "a5": "Yes, contact us after purchase with your order number and we'll issue a VAT invoice."
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "subtitle": "I'll answer your questions",
+    "welcome": "Hi! 👋 I'm the WB InCode Shop assistant. I can help you with questions about our products, licenses, payments and more. How can I help?",
+    "placeholder": "Ask a question...",
+    "open": "Open AI assistant chat",
+    "close": "Close chat",
+    "send": "Send",
+    "error": "An error occurred. Please try again."
   }
 }
