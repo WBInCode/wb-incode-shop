@@ -3,6 +3,38 @@ import prisma from "@/lib/prisma";
 
 type Params = Promise<{ slug: string }>;
 
+// Rewrite relative asset/link paths in HTML to absolute Blob URLs.
+// Leaves anchor hrefs (#section), absolute paths (/path), absolute URLs (http/https) untouched.
+function rewritePaths(html: string, baseUrl: string): string {
+  // src="relative/path" → src="baseUrl/relative/path"
+  html = html.replace(
+    /(\s(?:src|srcset|action))="(?!https?:\/\/|\/\/|data:|#|\/)([^"]*)"/gi,
+    (_, attr, path) => `${attr}="${baseUrl}${path}"`
+  );
+  html = html.replace(
+    /(\s(?:src|srcset|action))='(?!https?:\/\/|\/\/|data:|#|\/)([^']*)'/gi,
+    (_, attr, path) => `${attr}='${baseUrl}${path}'`
+  );
+
+  // href="relative/path" — skip anchors (#), absolute paths (/), absolute URLs (http/https), mailto:, tel:, javascript:
+  html = html.replace(
+    /(\shref)="(?!https?:\/\/|\/\/|#|mailto:|tel:|javascript:|data:|\/|)([^"]*)"/gi,
+    (_, attr, path) => `${attr}="${baseUrl}${path}"`
+  );
+  html = html.replace(
+    /(\shref)='(?!https?:\/\/|\/\/|#|mailto:|tel:|javascript:|data:|\/|)([^']*)'/gi,
+    (_, attr, path) => `${attr}='${baseUrl}${path}'`
+  );
+
+  // url('relative') or url("relative") in inline styles / style blocks
+  html = html.replace(
+    /url\((['"]?)(?!https?:\/\/|\/\/|data:|#|\/)([^'")]+)\1\)/gi,
+    (_, quote, path) => `url(${quote}${baseUrl}${path}${quote})`
+  );
+
+  return html;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Params }
@@ -19,7 +51,6 @@ export async function GET(
   }
 
   try {
-    // Fetch the HTML from Vercel Blob
     const response = await fetch(product.previewUrl);
 
     if (!response.ok) {
@@ -28,19 +59,12 @@ export async function GET(
 
     let html = await response.text();
 
-    // Rewrite relative asset paths to point to the Blob base URL
-    // e.g. previewUrl = https://xxx.blob.vercel-storage.com/previews/slug/index.html
-    // base = https://xxx.blob.vercel-storage.com/previews/slug/
-    const baseUrl = product.previewUrl.substring(
-      0,
-      product.previewUrl.lastIndexOf("/") + 1
-    );
+    // Base URL for relative assets: directory containing index.html on Blob
+    const baseUrl =
+      product.previewUrl.substring(0, product.previewUrl.lastIndexOf("/") + 1);
 
-    // Inject a <base> tag so relative URLs resolve against the Blob storage
-    html = html.replace(
-      /<head([^>]*)>/i,
-      `<head$1><base href="${baseUrl}">`
-    );
+    // Rewrite relative paths to absolute Blob URLs (no <base> tag — it breaks anchor navigation)
+    html = rewritePaths(html, baseUrl);
 
     return new NextResponse(html, {
       status: 200,
@@ -53,3 +77,4 @@ export async function GET(
     return new NextResponse("Preview unavailable", { status: 500 });
   }
 }
+
