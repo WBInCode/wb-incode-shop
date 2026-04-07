@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive, GripVertical, Link as LinkIcon, ImagePlus, Tag } from "lucide-react";
+import { Plus, Trash2, Loader2, Save, Image, Video, X, Upload, FileArchive, GripVertical, Link as LinkIcon, ImagePlus, Tag, Eye, Globe } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
@@ -42,6 +42,7 @@ interface ProductFormData {
   technologies: string;
   screenshots: string[];
   videoUrl: string;
+  previewUrl: string;
   fileUrl: string;
   variants: Variant[];
 }
@@ -71,6 +72,11 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
   const [dragOverImageIndex, setDragOverImageIndex] = useState<number | null>(null);
   const isProcessingQueue = useRef(false);
+  // Preview upload state
+  const [previewUploading, setPreviewUploading] = useState(false);
+  const [previewUploadProgress, setPreviewUploadProgress] = useState("");
+  const [previewDragOver, setPreviewDragOver] = useState(false);
+  const previewInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<ProductFormData>(
     initialData || {
       slug: "",
@@ -83,6 +89,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       technologies: "",
       screenshots: [],
       videoUrl: "",
+      previewUrl: "",
       fileUrl: "",
       variants: [
         {
@@ -331,6 +338,79 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     }
     setDraggedImageIndex(null);
     setDragOverImageIndex(null);
+  };
+
+  // Preview ZIP upload
+  const handlePreviewUpload = async (file: File) => {
+    if (!file.name.toLowerCase().endsWith(".zip")) {
+      setPreviewUploadProgress("Dozwolone tylko pliki ZIP");
+      return;
+    }
+    if (!data.slug) {
+      setPreviewUploadProgress("Najpierw ustaw slug produktu");
+      return;
+    }
+
+    setPreviewUploading(true);
+    setPreviewUploadProgress("Rozpakowywanie i przesyłanie plików...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("slug", data.slug);
+
+      const res = await fetch("/api/admin/upload-preview", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        setData((prev) => ({ ...prev, previewUrl: result.previewUrl }));
+        setPreviewUploadProgress(`Przesłano ${result.fileCount} plików`);
+        setTimeout(() => setPreviewUploadProgress(""), 3000);
+      } else {
+        setPreviewUploadProgress(result.error || "Błąd przesyłania");
+      }
+    } catch {
+      setPreviewUploadProgress("Błąd przesyłania preview");
+    } finally {
+      setPreviewUploading(false);
+    }
+  };
+
+  const handlePreviewDelete = async () => {
+    if (!data.slug) return;
+
+    setPreviewUploading(true);
+    setPreviewUploadProgress("Usuwanie preview...");
+
+    try {
+      const res = await fetch("/api/admin/upload-preview", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: data.slug }),
+      });
+
+      if (res.ok) {
+        setData((prev) => ({ ...prev, previewUrl: "" }));
+        setPreviewUploadProgress("");
+      } else {
+        setPreviewUploadProgress("Błąd usuwania preview");
+      }
+    } catch {
+      setPreviewUploadProgress("Błąd usuwania preview");
+    } finally {
+      setPreviewUploading(false);
+    }
+  };
+
+  const handlePreviewDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setPreviewDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handlePreviewUpload(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -738,6 +818,88 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           <p className="text-xs text-gray-600 mt-1.5">
             Wklej link do YouTube, Vimeo lub bezpośredni URL do pliku wideo. Zostanie wyświetlony jako podgląd na stronie produktu.
           </p>
+        </div>
+      </div>
+
+      {/* Live Preview */}
+      <div className="bg-surface border border-white/5 rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+          <Eye className="w-5 h-5 text-primary" />
+          Live Preview
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Wgraj plik ZIP ze statycznym HTML (wyeksportowanym z WordPress). Musi zawierać index.html w głównym folderze.
+        </p>
+
+        {data.previewUrl ? (
+          <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-xl mb-4">
+            <Globe className="w-6 h-6 text-primary flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white font-medium">Preview aktywny</p>
+              <a
+                href={data.previewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline truncate block"
+              >
+                {data.previewUrl}
+              </a>
+            </div>
+            <button
+              type="button"
+              onClick={handlePreviewDelete}
+              disabled={previewUploading}
+              className="p-1.5 text-gray-400 hover:text-red-400 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ) : null}
+
+        <div
+          onDragOver={(e) => { e.preventDefault(); setPreviewDragOver(true); }}
+          onDragLeave={() => setPreviewDragOver(false)}
+          onDrop={handlePreviewDrop}
+          onClick={() => previewInputRef.current?.click()}
+          className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+            previewDragOver
+              ? "border-primary bg-primary/5"
+              : "border-white/10 hover:border-white/20 bg-white/[0.02]"
+          }`}
+        >
+          <input
+            ref={previewInputRef}
+            type="file"
+            accept=".zip"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handlePreviewUpload(file);
+              e.target.value = "";
+            }}
+          />
+          {previewUploading ? (
+            <div className="flex flex-col items-center gap-2 py-2">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span className="text-sm text-gray-400">{previewUploadProgress}</span>
+            </div>
+          ) : (
+            <div className="py-2">
+              <FileArchive className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-400">
+                {data.previewUrl ? "Przeciągnij ZIP, aby zastąpić preview" : "Przeciągnij plik ZIP lub"}{" "}
+                <span className="text-primary">kliknij, aby wybrać</span>
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                ZIP z index.html + CSS/JS/obrazki — maks. 50MB
+              </p>
+            </div>
+          )}
+          {previewUploadProgress && !previewUploading && (
+            <p className={`text-xs mt-2 ${previewUploadProgress.startsWith("Przesłano") ? "text-green-400" : "text-red-400"}`}>
+              {previewUploadProgress}
+            </p>
+          )}
         </div>
       </div>
 

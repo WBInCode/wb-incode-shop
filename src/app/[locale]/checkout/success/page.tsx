@@ -2,7 +2,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getStripeSession } from "@/lib/stripe";
-import { createInvoice } from "@/lib/fakturownia";
+import { sendInvoiceRequestToAdmin } from "@/lib/email";
 import { CheckCircle2, XCircle, Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -43,12 +43,13 @@ export default async function CheckoutSuccessPage({
           });
           isPaid = true;
 
-          // Create invoice in Fakturownia (only if not already created)
+          // Notify admin to create invoice manually
           if (!order.invoiceCreated) {
             try {
               const isCompanyInvoice = order.wantInvoice && order.isCompany;
               const isPersonInvoice = order.wantInvoice && !order.isCompany;
-              await createInvoice({
+              await sendInvoiceRequestToAdmin({
+                orderId: order.id,
                 buyerName: isCompanyInvoice && order.companyName
                   ? order.companyName
                   : isPersonInvoice && order.personName
@@ -63,10 +64,7 @@ export default async function CheckoutSuccessPage({
                     : undefined,
                 isCompany: order.wantInvoice ? order.isCompany : undefined,
                 productName: order.product.namePl,
-                quantity: 1,
                 totalPriceGross: order.amount / 100,
-                tax: 23,
-                orderId: order.id,
                 kind: order.wantInvoice ? "vat" : "receipt",
               });
               await prisma.order.update({
@@ -74,7 +72,7 @@ export default async function CheckoutSuccessPage({
                 data: { invoiceCreated: true },
               });
             } catch (invoiceError) {
-              console.error("Failed to create Fakturownia invoice:", invoiceError);
+              console.error("Failed to send invoice notification to admin:", invoiceError);
             }
           }
         } else if (session?.status === "expired") {
