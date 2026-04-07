@@ -35,36 +35,66 @@ function getMimeType(filename: string): string {
 }
 
 /**
- * Rewrite relative paths in HTML to proxy-relative absolute paths.
- * Everything goes through the proxy — no direct Blob URLs.
+ * Resolve a relative path (with ../ segments) against a base directory.
+ * resolvePath("oferta/penthouse/", "../../style.css") → "style.css"
+ * resolvePath("", "assets/js/main.js") → "assets/js/main.js"
+ */
+function resolvePath(baseDir: string, relativePath: string): string {
+  const parts = baseDir.split("/").filter(Boolean);
+  const relParts = relativePath.split("/");
+  for (const part of relParts) {
+    if (part === "..") {
+      parts.pop();
+    } else if (part !== "." && part !== "") {
+      parts.push(part);
+    }
+  }
+  return parts.join("/");
+}
+
+/**
+ * Rewrite relative paths in HTML to absolute proxy URLs.
+ * Resolves ../ paths based on the file's directory within the preview.
  * Leaves #anchors, absolute URLs, and special protocols untouched.
  */
-function rewriteToProxy(html: string, proxyBase: string): string {
-  // src="relative", srcset="relative", action="relative" — double quotes
+function rewriteHtml(
+  html: string,
+  slug: string,
+  filePath: string | null
+): string {
+  // Directory of current file within the preview folder
+  const dir = filePath
+    ? filePath.substring(0, filePath.lastIndexOf("/") + 1)
+    : "";
+  const proxyBase = `/api/preview/${slug}/`;
+
+  const resolve = (relPath: string) => proxyBase + resolvePath(dir, relPath);
+
+  // src, srcset, action — double quotes
   html = html.replace(
     /(\s(?:src|srcset|action))="(?![a-z][a-z0-9+.-]*:|\/\/|#|\/)([^"]+)"/gi,
-    (_, attr, path) => `${attr}="${proxyBase}${path}"`
+    (_, attr, path) => `${attr}="${resolve(path)}"`
   );
-  // Same for single quotes
+  // src, srcset, action — single quotes
   html = html.replace(
     /(\s(?:src|srcset|action))='(?![a-z][a-z0-9+.-]*:|\/\/|#|\/)([^']+)'/gi,
-    (_, attr, path) => `${attr}='${proxyBase}${path}'`
+    (_, attr, path) => `${attr}='${resolve(path)}'`
   );
 
-  // href="relative" — skip #anchors, /absolute, any-scheme:, //protocol-relative
+  // href — skip #anchors, /absolute, schemes, //protocol-relative
   html = html.replace(
     /(\shref)="(?![a-z][a-z0-9+.-]*:|\/\/|#|\/)([^"]+)"/gi,
-    (_, attr, path) => `${attr}="${proxyBase}${path}"`
+    (_, attr, path) => `${attr}="${resolve(path)}"`
   );
   html = html.replace(
     /(\shref)='(?![a-z][a-z0-9+.-]*:|\/\/|#|\/)([^']+)'/gi,
-    (_, attr, path) => `${attr}='${proxyBase}${path}'`
+    (_, attr, path) => `${attr}='${resolve(path)}'`
   );
 
-  // url() in inline <style> blocks — skip schemes, data:, #, /
+  // url() in inline <style> blocks — skip schemes, //, #, /
   html = html.replace(
     /url\((['"]?)(?![a-z][a-z0-9+.-]*:|\/\/|#|\/)([^'")]+)\1\)/gi,
-    (_, quote, path) => `url(${quote}${proxyBase}${path}${quote})`
+    (_, quote, path) => `url(${quote}${resolve(path)}${quote})`
   );
 
   return html;
@@ -120,11 +150,11 @@ export async function GET(
     if (isHtml) {
       let html = await response.text();
 
-      // Rewrite relative paths to proxy URLs (not Blob URLs)
-      // This ensures all resources load through the proxy, avoiding
-      // Blob's Content-Disposition: attachment and CORS issues.
-      const proxyBase = `/api/preview/${slug}/`;
-      html = rewriteToProxy(html, proxyBase);
+      // Rewrite relative paths to absolute proxy URLs.
+      // resolvePath handles ../ segments based on the file's directory,
+      // so subpage HTML (e.g. oferta/slug/index.html with ../../style.css)
+      // resolves correctly to /api/preview/{slug}/style.css
+      html = rewriteHtml(html, slug, filePath);
 
       return new NextResponse(html, {
         status: 200,
