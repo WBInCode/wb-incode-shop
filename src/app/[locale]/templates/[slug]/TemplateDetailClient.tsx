@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Play, X, Monitor } from "lucide-react";
+import { ArrowLeft, Play, X, Monitor, Eye } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,6 +31,7 @@ interface Product {
   technologies: string[];
   screenshots: string[];
   videoUrl?: string | null;
+  previewUrl?: string | null;
   variants: Variant[];
 }
 
@@ -62,6 +63,7 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
   const selectedVariant = product.variants.find((v) => v.id === selectedVariantId);
   const hasScreenshots = product.screenshots.length > 0;
   const videoEmbedUrl = product.videoUrl ? getVideoEmbedUrl(product.videoUrl) : null;
+  const hasPreview = !!product.previewUrl;
 
   return (
     <div>
@@ -136,6 +138,24 @@ export default function TemplateDetailClient({ product }: { product: Product }) 
                 </button>
               ))}
             </div>
+          )}
+
+          {/* Live Preview button */}
+          {hasPreview && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.15, ease: "easeOut" }}
+              className="mb-8"
+            >
+              <Link
+                href={`/${locale}/templates/${product.slug}/preview`}
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 rounded-2xl text-white font-semibold hover:from-primary/30 hover:to-primary/20 hover:border-primary/50 transition-all group"
+              >
+                <Eye className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                {t("livePreview")}
+              </Link>
+            </motion.div>
           )}
 
           {/* Video embed */}

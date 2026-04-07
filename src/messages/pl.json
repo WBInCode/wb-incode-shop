@@ -55,7 +55,13 @@
     "video": "Podgląd wideo",
     "variants": "Wybierz licencję",
     "buyNow": "Kup teraz",
-    "back": "Powrót do produktów"
+    "back": "Powrót do produktów",
+    "livePreview": "Podgląd na żywo"
+  },
+  "preview": {
+    "back": "Powrót",
+    "buy": "Kup szablon",
+    "loading": "Ładowanie podglądu..."
   },
   "checkout": {
     "title": "Finalizacja zakupu",

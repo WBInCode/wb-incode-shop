@@ -31,6 +31,7 @@ model Product {
   technologies   String    @default("[]") // JSON array string
   screenshots    String    @default("[]") // JSON array string
   videoUrl       String?   // YouTube/Vimeo embed URL or direct video URL
+  previewUrl     String?   // Static HTML preview URL (Vercel Blob)
   fileUrl        String
   featured       Boolean   @default(false)
   active         Boolean   @default(true)
