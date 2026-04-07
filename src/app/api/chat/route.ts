@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { streamText, convertToModelMessages, type UIMessage } from "ai";
 
 const SYSTEM_PROMPT = `Jesteś asystentem sklepu WB InCode Shop — sklepu z profesjonalnymi produktami cyfrowymi (szablony stron, narzędzia, skrypty, wtyczki) tworzonymi przez software house.
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   const modelMessages = await convertToModelMessages(recentMessages);
 
   const result = streamText({
-    model: openai("gpt-4o-mini"),
+    model: google("gemini-2.0-flash"),
     system:
       SYSTEM_PROMPT +
       (locale === "en"

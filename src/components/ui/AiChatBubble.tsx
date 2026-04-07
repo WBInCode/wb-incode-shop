@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, type UIMessage } from "ai";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -13,15 +14,17 @@ export default function AiChatBubble() {
   const locale = useLocale();
   const t = useTranslations("chat");
 
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: { locale },
+      }),
+    [locale]
+  );
+
   const { messages, setMessages, sendMessage, status, error } = useChat({
-    transport: {
-      api: "/api/chat",
-      body: { locale },
-    } as Parameters<typeof useChat>[0] extends infer T
-      ? T extends { transport: infer U }
-        ? U
-        : never
-      : never,
+    transport,
   });
 
   const [input, setInput] = useState("");
@@ -83,7 +86,7 @@ export default function AiChatBubble() {
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-primary text-primary-foreground shadow-[0_0_30px_rgba(48,232,122,0.3)] hover:shadow-[0_0_40px_rgba(48,232,122,0.5)] transition-shadow cursor-pointer"
+            className="fixed bottom-24 right-6 z-[60] p-4 rounded-full bg-primary text-primary-foreground shadow-[0_0_30px_rgba(48,232,122,0.3)] hover:shadow-[0_0_40px_rgba(48,232,122,0.5)] transition-shadow cursor-pointer"
             aria-label={t("open")}
           >
             <MessageCircle className="w-6 h-6" />
@@ -99,7 +102,7 @@ export default function AiChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-4rem)] flex flex-col rounded-2xl bg-surface/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden"
+            className="fixed bottom-6 right-6 z-[60] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-4rem)] flex flex-col rounded-2xl bg-surface/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-gradient-to-r from-primary/10 via-transparent to-transparent">
