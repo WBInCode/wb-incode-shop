@@ -58,7 +58,7 @@ export default function TemplatePreview({ previewUrl, productName, productSlug }
               <button
                 key={mode}
                 type="button"
-                onClick={() => { setViewMode(mode); setLoading(true); }}
+                onClick={() => setViewMode(mode)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                   viewMode === mode
                     ? "bg-primary/20 text-primary"
@@ -105,7 +105,6 @@ export default function TemplatePreview({ previewUrl, productName, productSlug }
             src={previewUrl}
             title={`${productName} preview`}
             className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin"
             onLoad={handleIframeLoad}
           />
         </div>
